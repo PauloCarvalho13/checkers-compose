@@ -40,6 +40,6 @@ fun Game.showBoard(){
 
     println(" +${"-".repeat(BOARD_DIM * 2 - 1)}+")
 
-    println("Turn = ${turn.name.lowercase()}")
-    println("Player = ${turn.other.name.lowercase()}")
+    println("Turn = ${turn.symbol}")
+    println("Player = ${turn.other.symbol}")
 }

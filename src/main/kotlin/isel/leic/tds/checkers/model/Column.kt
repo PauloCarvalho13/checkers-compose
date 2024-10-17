@@ -1,6 +1,8 @@
 package isel.leic.tds.checkers.model
+
+import isel.leic.tds.checkers.BOARD_DIM
+
 const val FIRST_CHAR_CODE = 97 // a
-const val BOARD_DIM = 8
 
 @JvmInline
 value class Column(val index: Int) {

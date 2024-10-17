@@ -1,5 +1,6 @@
 package isel.leic.tds.checkers.ui
 
+import isel.leic.tds.checkers.BOARD_DIM
 import isel.leic.tds.checkers.model.*
 
 fun Game.showBoard(){
@@ -28,7 +29,7 @@ fun Game.showBoard(){
                     else playerChar
                 print("$pieceChar ")
             } else {
-                if (square.black) {
+                if (!square.black) {
                     print("- ")
                 } else {
                     print("  ")

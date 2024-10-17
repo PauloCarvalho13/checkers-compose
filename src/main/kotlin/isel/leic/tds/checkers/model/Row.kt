@@ -1,5 +1,7 @@
 package isel.leic.tds.checkers.model
 
+import isel.leic.tds.checkers.BOARD_DIM
+
 
 @JvmInline
 value class Row(val index: Int) {

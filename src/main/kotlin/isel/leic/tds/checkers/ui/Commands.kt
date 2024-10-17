@@ -1,5 +1,6 @@
 package isel.leic.tds.checkers.ui
 
+import isel.leic.tds.checkers.BOARD_SIZE
 import isel.leic.tds.checkers.model.*
 
 abstract class Command(val argsSyntax: String = "") {
@@ -19,7 +20,7 @@ object StartCommand: Command("<gameId>") {
     override fun execute(args: List<String>, game: Game?): Game {
         require(args.size == 1) { "Missing Id" }
         require(args[0].toIntOrNull() != null){"String is not a valid number"}
-        return Game(id = args[0].toInt(), board = getInitialBoard(BOARD_DIM), turn = Player.BLACK)
+        return Game(id = args[0].toInt(), board = getInitialBoard(BOARD_SIZE), turn = Player.BLACK)
     }
 }
 

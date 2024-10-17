@@ -1,10 +1,11 @@
 package isel.leic.tds.checkers.model
 
+import isel.leic.tds.checkers.BOARD_DIM
 import isel.leic.tds.checkers.model.Square.Companion.values
 
 class Square private constructor (val index: Int) {
     init {
-        require( BOARD_DIM % 2 == 0)
+        require(BOARD_DIM % 2 == 0)
     }
     val row get() = Row(index / BOARD_DIM)
     val column get() = Column(index % BOARD_DIM)

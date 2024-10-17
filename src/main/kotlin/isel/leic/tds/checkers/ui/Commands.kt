@@ -18,9 +18,8 @@ object PlayCommand: Command("<from> <to>") {
 
 object StartCommand: Command("<gameId>") {
     override fun execute(args: List<String>, game: Game?): Game {
-        require(args.size == 1) { "Missing Id" }
-        require(args[0].toIntOrNull() != null){"String is not a valid number"}
-        return Game(id = args[0].toInt(), board = getInitialBoard(BOARD_SIZE), turn = Player.BLACK)
+        require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
+        return Game(gameId = args[0], board = getInitialBoard(), turn = Colour.WHITE, initPlayer = Colour.WHITE)
     }
 }
 

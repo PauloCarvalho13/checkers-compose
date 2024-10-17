@@ -1,3 +1,4 @@
+import isel.leic.tds.checkers.BOARD_DIM
 import kotlin.test.*
 import isel.leic.tds.checkers.model.*
 

@@ -20,19 +20,24 @@ fun Game.showBoard(){
 
             if (boardPosition?.piece != null) {
                 val piece = boardPosition.piece
-                val playerChar =
-                    if (piece.player == Player.BLACK) piece.player.symbol
-                    else piece.player.symbol
+                val colourChar = piece.colour.symbol
 
                 val pieceChar =
-                    if (piece.type == Type.DAMA) playerChar.uppercaseChar()
-                    else playerChar
-                print("$pieceChar ")
+                    if (piece.type == Type.DAMA) colourChar.uppercaseChar()
+                    else colourChar
+                print("$pieceChar")
+                if(col != BOARD_DIM - 1){
+                    print(" ")
+                }
+
             } else {
-                if (!square.black) {
-                    print("- ")
+                if (square.black) {
+                    print("-")
                 } else {
-                    print("  ")
+                    print(" ")
+                }
+                if(col != BOARD_DIM -1){
+                    print(" ")
                 }
             }
         }
@@ -42,5 +47,5 @@ fun Game.showBoard(){
     println(" +${"-".repeat(BOARD_DIM * 2 - 1)}+")
 
     println("Turn = ${turn.symbol}")
-    println("Player = ${turn.other.symbol}")
+    println("Player = ${initPlayer.symbol}")
 }

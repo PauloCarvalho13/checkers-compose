@@ -1,7 +1,7 @@
 package isel.leic.tds.checkers.model
 
-enum class Type{
-    DAMA, PEAO
-}
 
-data class Piece(val type: Type, val colour: Colour)
+abstract class Piece(val player: Player = Player.BLACK){
+    open fun canMove(position: Square, board: Map<Square,Piece>): Map<Square,Piece> = board
+    open fun canCapture(position: Square, board: Map<Square,Piece>): Map<Square,Piece> = board
+}

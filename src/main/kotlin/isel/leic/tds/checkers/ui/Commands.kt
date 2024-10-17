@@ -1,6 +1,5 @@
 package isel.leic.tds.checkers.ui
 
-import isel.leic.tds.checkers.BOARD_SIZE
 import isel.leic.tds.checkers.model.*
 
 abstract class Command(val argsSyntax: String = "") {
@@ -19,7 +18,7 @@ object PlayCommand: Command("<from> <to>") {
 object StartCommand: Command("<gameId>") {
     override fun execute(args: List<String>, game: Game?): Game {
         require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
-        return Game(gameId = args[0], board = getInitialBoard(), turn = Colour.WHITE, initPlayer = Colour.WHITE)
+        return Game(gameId = args[0], board = getInitialBoard(), turn = Player.WHITE, initPlayer = Player.WHITE)
     }
 }
 

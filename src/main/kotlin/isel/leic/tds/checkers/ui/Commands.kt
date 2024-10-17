@@ -15,9 +15,12 @@ object PlayCommand: Command("<from> <to>") {
     }
 }
 
-object StartCommand: Command() {
-    override fun execute(args: List<String>, game: Game?): Game
-        = Game(board = getInitialBoard(BOARD_DIM), turn = Player.BLACK)
+object StartCommand: Command("<gameId>") {
+    override fun execute(args: List<String>, game: Game?): Game {
+        require(args.size == 1) { "Missing Id" }
+        require(args[0].toIntOrNull() != null){"String is not a valid number"}
+        return Game(id = args[0].toInt(), board = getInitialBoard(BOARD_DIM), turn = Player.BLACK)
+    }
 }
 
 object GridCommand: Command(){

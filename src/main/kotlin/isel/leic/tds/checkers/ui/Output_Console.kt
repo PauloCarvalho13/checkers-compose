@@ -4,7 +4,6 @@ import isel.leic.tds.checkers.BOARD_DIM
 import isel.leic.tds.checkers.model.*
 
 fun Game.showBoard(){
-
     print("  ")
     repeat(BOARD_DIM) { col -> print("${'a' + col} ") }
     println()
@@ -15,30 +14,27 @@ fun Game.showBoard(){
         print("$row|")
 
         repeat(BOARD_DIM) { col ->
-            val square = Square(Row(row - 1), Column(col))
-            val boardPosition = board.find { it.square == square }
+            val r = Row(BOARD_DIM - row)
+            val c = Column(col)
+            val square = "${r.digit}${c.symbol}".toSquare()
+            if (square.black) {
+                val boardPosition = board.playingPlaces.entries.first { it.key == square }
+                if (boardPosition.value != null) {
+                    val piece = boardPosition.value
+                    val colourChar = piece?.player?.symbol
 
-            if (boardPosition?.piece != null) {
-                val piece = boardPosition.piece
-                val colourChar = piece.colour.symbol
-
-                val pieceChar =
-                    if (piece.type == Type.DAMA) colourChar.uppercaseChar()
-                    else colourChar
-                print("$pieceChar")
-                if(col != BOARD_DIM - 1){
-                    print(" ")
-                }
-
-            } else {
-                if (square.black) {
-                    print("-")
+                    val pieceChar =
+                        if (piece is Queen) colourChar?.uppercaseChar()
+                        else colourChar
+                    print("$pieceChar")
                 } else {
-                    print(" ")
+                    print("-")
                 }
-                if(col != BOARD_DIM -1){
-                    print(" ")
-                }
+            } else {
+                print(" ")
+            }
+            if (col != BOARD_DIM - 1) {
+                print(" ")
             }
         }
         println("|")

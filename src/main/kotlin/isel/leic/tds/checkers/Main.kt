@@ -22,7 +22,6 @@ fun main() {
             game = cmd.execute(args, game)
             if (cmd.leave()) break
             game!!.showBoard()
-            println(game.board)
         }catch (e: IllegalArgumentException){
             println(e.message)
         }catch (e:IllegalStateException){

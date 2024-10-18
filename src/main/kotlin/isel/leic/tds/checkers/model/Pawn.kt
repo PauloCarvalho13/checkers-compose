@@ -1,6 +1,6 @@
 package isel.leic.tds.checkers.model
 
-class Pawn: Piece() {
+class Pawn(player: Player) : Piece(player) {
     override fun canMove(position: Square, board: Map<Square,Piece>): Map<Square,Piece> {
         return super.canMove(position, board)
     }

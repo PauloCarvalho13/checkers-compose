@@ -1,6 +1,6 @@
 package isel.leic.tds.checkers.model
 
-class Queen: Piece() {
+class Queen(player: Player) : Piece(player) {
     override fun canCapture(position: Square, board: Map<Square,Piece>): Map<Square,Piece> {
         return super.canCapture(position, board)
     }

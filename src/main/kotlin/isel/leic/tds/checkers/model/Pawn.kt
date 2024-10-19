@@ -100,34 +100,3 @@ fun Square.getMiddleSquare(to: Square): Square? {
     }
 }
 
-
-fun main() {
-    val whitePlayer = Player.WHITE
-    val blackPlayer = Player.BLACK
-
-    val board = getInitialBoard()
-    val game = Game(gameId = "1",board = board, turn = whitePlayer, initPlayer = blackPlayer)
-    game.showBoard()
-
-    val whitePawn = Pawn(whitePlayer)
-    val blackPawn = Pawn(blackPlayer)
-
-    val whiteSquareMov = "4d".toSquare() //index 3 0
-    val blackSquareMov = "5e".toSquare() //index 2 1
-
-    // Teste de movimentos
-    val newBoardAfterMove = whitePawn.canMove(whiteSquareMov, board)
-    val newBoardAfterMove1 = blackPawn.canMove(blackSquareMov, newBoardAfterMove)
-
-    //println("Possíveis movimentos da whitePawn(${whiteSquareMov}): ${newBoardAfterMove.playingPlaces.keys} ")
-    //println("Possíveis movimentos de blackPawn(${blackSquareMov}): ${newBoardAfterMove1.playingPlaces.keys}")
-
-    // Teste de captura
-    val boardWithBlackPawn = Board(mapOf(blackSquareMov to blackPawn))
-    val newBoardAfterCapture = whitePawn.canCapture(whiteSquareMov, boardWithBlackPawn)
-    //val newBoardAfterCapture1 = blackPawn.canCapture(blackSquareMov, board)
-
-    println("Possíveis capturas de whitePawn: ${newBoardAfterCapture.playingPlaces.keys}")
-    //println("Possíveis capturas de blackPawn: ${newBoardAfterCapture1.playingPlaces.keys}")
-
-}

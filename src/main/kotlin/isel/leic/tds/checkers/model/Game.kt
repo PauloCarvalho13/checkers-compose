@@ -38,7 +38,16 @@ fun Game.isValidMove(piecePosition: Square, newPiecePosition: Square, turn: Play
 
 fun Game.play(from: Square, to: Square): Game {
     val fromPiece = board.playingPlaces[from]
-    require(fromPiece != null) { "No piece at the starting position" }
+    require(fromPiece != null) { "No piece at the from position" }
+
+    val captureBoard = getAllCaptures(this.turn)
+
+    if (captureBoard.playingPlaces.isNotEmpty()) {
+        if (!captureBoard.playingPlaces.containsKey(from)) {
+            println("Captures available in ${captureBoard.playingPlaces.keys}, you must capture!")
+            return this
+        }
+    }
 
     if (isValidMove(from, to, this.turn)) {
 
@@ -47,20 +56,28 @@ fun Game.play(from: Square, to: Square): Game {
 
         // If there is no Moves check if there is Captures
         if (possibleMoves.playingPlaces.containsKey(to)) {
-            return this.copy(board = board.updateBoard(from, to, fromPiece), turn = turn.other)
+            //Checking if the piece is a Pawn or a Queen
+            val checkPiece = checkPiece(to, fromPiece)
+            // Updating the board and changing the turn
+            return this.copy(board = board.updateBoard(from, to, checkPiece), turn = turn.other)
         }else{
+
             val possibleCaptures = fromPiece.canCapture(from, board)
             // if there is no Captures -> error
             if(possibleCaptures.playingPlaces.isEmpty()){
-                println("NO CAPTURES AND NO MOVES")
+                println("Invalid Move")
+                println("Play Again!")
                 return this // still this turn because something went wrong
             }else{
                 //Checking if the Square to its in possibleCaptures and update board
                 if (possibleCaptures.playingPlaces.containsKey(to)){
-                    val updatedGame = this.copy(board = board.updateBoard(from, to, fromPiece))
+                    //Checking if the piece is a Pawn or a Queen
+                    val checkPiece = checkPiece(to, fromPiece)
 
-                    if (fromPiece.canCapture(to, updatedGame.board).playingPlaces.isNotEmpty()) {
-                        println("Multiple captures possible!")
+                    val updatedGame = this.copy(board = board.updateBoard(from, to, checkPiece))
+
+                    if (checkPiece.canCapture(to, updatedGame.board).playingPlaces.isNotEmpty()) {
+                        println("You can play again!")
                         return updatedGame // Turn doesn't change
                     } else {
                         // If there is no more Captures, change turn
@@ -70,9 +87,39 @@ fun Game.play(from: Square, to: Square): Game {
             }
         }
     } else {
-        println("Position Invalid")
+        println("Invalid Position")
         return this
     }
     return this
 }
 
+fun Game.checkPiece(to: Square, piece: Piece): Piece{
+    return when(piece){
+        is Pawn -> {
+            if(piece.player == Player.WHITE && to.row.digit == '8'){
+                Queen(Player.WHITE)
+            }
+            else if (piece.player == Player.BLACK && to.row.digit == '1'){
+                Queen(Player.BLACK)
+            }
+            else{
+                piece // There's no condition to change pawn to queen so it remains the same piece
+            }
+        }
+        else -> piece // if it's already a Queen stays the same
+    }
+}
+
+fun Game.getAllCaptures(player: Player): Board {
+    val captures = buildMap<Square, Piece?> {
+        board.playingPlaces.forEach { (square, piece) ->
+            if (piece != null && piece.player == player) {
+                val possibleCaptures = piece.canCapture(square, board)
+                if (possibleCaptures.playingPlaces.isNotEmpty()) {
+                    put(square, piece) // Adiciona a peça que pode capturar
+                }
+            }
+        }
+    }
+    return Board(playingPlaces = captures)
+}

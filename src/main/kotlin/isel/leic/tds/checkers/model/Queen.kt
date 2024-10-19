@@ -36,7 +36,7 @@ class Queen(player: Player) : Piece(player) {
                 }
                 .drop(1)
                 .toList()
-        }//.distinct()
+        }
         return Board(validMoves.associateWith { this })
     }
 }

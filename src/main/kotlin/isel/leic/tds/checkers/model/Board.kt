@@ -9,7 +9,7 @@ data class Board(val playingPlaces: Map<Square,Piece?>) {
 
         val middleSquare = from.getMiddleSquare(to)
         if (middleSquare != null) {
-            newPlayingPlaces[middleSquare] = null // Remove a peça capturada
+            newPlayingPlaces[middleSquare] = null // Remove the piece that was captured
         }
 
         return this.copy(playingPlaces = newPlayingPlaces)

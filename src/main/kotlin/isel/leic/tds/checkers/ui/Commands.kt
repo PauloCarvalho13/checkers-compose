@@ -8,6 +8,7 @@ abstract class Command(val argsSyntax: String = "") {
 }
 
 object PlayCommand: Command("<from> <to>") {
+
     override fun execute(args: List<String>, game: Game?): Game {
         check(game != null) { "Game not started" }
         require(args.size == 2) { "Missing position" }
@@ -16,6 +17,7 @@ object PlayCommand: Command("<from> <to>") {
 }
 
 object StartCommand: Command("<gameId>") {
+
     override fun execute(args: List<String>, game: Game?): Game {
         require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
         return Game(gameId = args[0], board = getInitialBoard(), turn = Player.WHITE, initPlayer = Player.WHITE)
@@ -23,9 +25,9 @@ object StartCommand: Command("<gameId>") {
 }
 
 object GridCommand: Command(){
+
     override fun execute(args: List<String>, game: Game?): Game {
         check(game != null) { "Game yet to be started" }
-        game.showBoard()
         return game
     }
 }

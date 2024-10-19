@@ -29,63 +29,50 @@ fun getInitialBoard(): Board =
        }
     )
 
-fun Game.isValidMove(piecePosition: Map.Entry<Square, Piece?>, newPiecePosition: Map.Entry<Square, Piece?>, turn: Player)
-        =   piecePosition.value != null
-        && piecePosition.value!!.player == turn
-        && newPiecePosition.key.black
-        && newPiecePosition.value == null
+fun Game.isValidMove(piecePosition: Square, newPiecePosition: Square, turn: Player)
+        =  board.playingPlaces[piecePosition] != null
+        && board.playingPlaces[piecePosition]?.player == turn
+        && newPiecePosition.black
+        && board.playingPlaces[newPiecePosition] == null
 
 
 fun Game.play(from: Square, to: Square): Game {
-    val piecePosition = board.playingPlaces.entries.first { it.key == from }
-    val newPiecePosition = board.playingPlaces.entries.first { it.key == to }
+    val fromPiece = board.playingPlaces[from]
+    require(fromPiece != null) { "No piece at the starting position" }
 
-    if (isValidMove(piecePosition, newPiecePosition, this.turn)) {
-        //I want to change the piece in the boardPosition (square, piece)
-        //the pieceposition piece becomes null and newpiecePosition changes to pieceposition piece
-        //in the board
-        //val checkCapture = canCapture(piecePosition)
+    if (isValidMove(from, to, this.turn)) {
 
-        val updatedBoard = board.playingPlaces.mapValues { (square, piece) ->
-            when (square) {
-                piecePosition.key -> null
-                newPiecePosition.key -> newPiecePosition.value
-                else -> piece
+        //Checking the possible Moves from can do
+        val possibleMoves = fromPiece.canMove(from, board)
+
+        // If there is no Moves check if there is Captures
+        if (possibleMoves.playingPlaces.containsKey(to)) {
+            return this.copy(board = board.updateBoard(from, to, fromPiece), turn = turn.other)
+        }else{
+            val possibleCaptures = fromPiece.canCapture(from, board)
+            // if there is no Captures -> error
+            if(possibleCaptures.playingPlaces.isEmpty()){
+                println("NO CAPTURES AND NO MOVES")
+                return this // still this turn because something went wrong
+            }else{
+                //Checking if the Square to its in possibleCaptures and update board
+                if (possibleCaptures.playingPlaces.containsKey(to)){
+                    val updatedGame = this.copy(board = board.updateBoard(from, to, fromPiece))
+
+                    if (fromPiece.canCapture(to, updatedGame.board).playingPlaces.isNotEmpty()) {
+                        println("Multiple captures possible!")
+                        return updatedGame // Turn doesn't change
+                    } else {
+                        // If there is no more Captures, change turn
+                        return updatedGame.copy(turn = turn.other)
+                    }
+                }
             }
         }
-        //Verify if newPiece has more captures so it can still play
-
-        val updatedGame = this.copy(board = Board(updatedBoard))
-
     } else {
         println("Position Invalid")
         return this
-
     }
     return this
 }
 
-//PEAO -> Posição (4,d)
-//Pode jogar em (2,b) (6,f) (2,f) (6,b)
-
-/*
-//DAMA ->
-fun Game.canCapture(position: BoardPosition): Boolean{
-    return when(position.piece?.type){
-        Type.PEAO ->{}
-        Type.DAMA ->{}
-        else -> false
-    }
-}*/
-
-fun Game.canMove(position: Board): Boolean{
-    TODO()
-}
-
-fun Game.Move(){
-    TODO()
-}
-
-fun Game.Capture(){
-    TODO()
-}

@@ -38,12 +38,11 @@ class Pawn(player: Player): Piece(player) {
     //PEAO -> Posição (4,d)
     //Pode jogar em (2,b) (6,f) (2,f) (6,b)
     override fun canCapture(position: Square, board: Board): Board {
-        val captureDirections = listOf(
-            Direction.UP_LEFT_CAP,
-            Direction.UP_RIGHT_CAP,
-            Direction.DOWN_LEFT_CAP,
-            Direction.DOWN_RIGHT_CAP
-        )
+        val captureDirections = if(player == Player.WHITE){
+            listOf(Direction.DOWN_LEFT_CAP, Direction.DOWN_RIGHT_CAP)
+        }else{
+            listOf(Direction.UP_LEFT_CAP,Direction.UP_RIGHT_CAP)
+        }
 
         //Valid Moves to Capture if there is a piece different then ours in the middle of our targetSquare
         val captureMoves = captureDirections.mapNotNull { direction ->

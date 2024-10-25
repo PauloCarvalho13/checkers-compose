@@ -1,7 +1,6 @@
 package isel.leic.tds.checkers.model
 
 import isel.leic.tds.checkers.BOARD_DIM
-import isel.leic.tds.checkers.ui.showBoard
 import kotlin.math.absoluteValue
 
 enum class Direction(val row: Int, val column: Int) {
@@ -18,8 +17,9 @@ enum class Direction(val row: Int, val column: Int) {
 class Pawn(player: Player): Piece(player) {
     //PEAO -> Posição (4,d)
     //Pode jogar em (5,c) (5,e)
+
     override fun canMove(position: Square, board: Board): Board {
-        val directions = if (player == Player.WHITE) {
+        /*val directions = if (player == Player.WHITE) {
             listOf(Direction.UP_LEFT, Direction.UP_RIGHT)
         } else {
             listOf(Direction.DOWN_LEFT, Direction.DOWN_RIGHT)
@@ -32,13 +32,14 @@ class Pawn(player: Player): Piece(player) {
             }?.let { newSquare -> newSquare to this }
         }.toMap()
 
-        return Board(newPlayingPlaces)
+        return Board(newPlayingPlaces)*/
+        return (board)
     }
 
     //PEAO -> Posição (4,d)
     //Pode jogar em (2,b) (6,f) (2,f) (6,b)
     override fun canCapture(position: Square, board: Board): Board {
-        val captureDirections = if(player == Player.WHITE){
+        /*val captureDirections = if(player == Player.WHITE){
             listOf(Direction.DOWN_LEFT_CAP, Direction.DOWN_RIGHT_CAP)
         }else{
             listOf(Direction.UP_LEFT_CAP,Direction.UP_RIGHT_CAP)
@@ -70,7 +71,12 @@ class Pawn(player: Player): Piece(player) {
         }.toMap()
 
         return Board(captureMoves)
+
+         */
+        return board
     }
+
+
 
 }
 

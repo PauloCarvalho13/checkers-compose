@@ -9,7 +9,7 @@ class Queen(player: Player) : Piece(player) {
         Direction.DOWN_RIGHT
     )
     override fun canCapture(position: Square, board: Board): Board{
-        val posCaptures = super.canCapture(position, board)
+        /*val posCaptures = super.canCapture(position, board)
         val captureMoves = directions.flatMap { direction ->
             val middleSquare = position.move(direction)
             val targetSquare = middleSquare?.move(direction)
@@ -24,10 +24,14 @@ class Queen(player: Player) : Piece(player) {
         }.toMap()
 
         return Board(posCaptures.playingPlaces + captureMoves)
+
+         */
+        return board
     }
 
     override fun canMove(position: Square, board: Board): Board {
-        val validMoves = directions.flatMap { direction ->
+
+        /*val validMoves = directions.flatMap { direction ->
             generateSequence(position) { it.move(direction) }
                 .takeWhile {
                     it != null &&
@@ -38,5 +42,8 @@ class Queen(player: Player) : Piece(player) {
                 .toList()
         }
         return Board(validMoves.associateWith { this })
+
+         */
+        return board
     }
 }

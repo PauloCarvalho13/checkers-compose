@@ -14,14 +14,13 @@ fun Board.show() {
         print("$row|")
 
         repeat(BOARD_DIM) { col ->
-            val r = Row(row - 1)
-            val c = Column(BOARD_DIM - col - 1)
+            val r = Row(BOARD_DIM - row)
+            val c = Column(col)
             val square = Square(r, c)
 
             if (square.black) {
 
                 val piece = moves[square]
-
                 if (piece != null) {
                     val colourChar = piece.player.symbol
 
@@ -39,7 +38,18 @@ fun Board.show() {
             }
         }
 
-        println("|")
+        print("|")
+        when(row){
+            8 -> {
+                if (this is BoardRun)
+                    print("  Turn = ${turn.symbol}")
+            }
+            7 -> {
+                if(this is BoardRun)
+                    print("  Player = ${turn.symbol} (this is turn cuz we are yet to save the which player it is)")
+            }
+        }
+        println()
     }
 
     println(" +${"-".repeat(BOARD_DIM * 2 - 1)}+")
@@ -47,9 +57,14 @@ fun Board.show() {
     print("  ")
     repeat(BOARD_DIM) { col -> print("${'a' + col} ") }
     println()
+    println("")
 }
 
-fun Game.show() = board?.show()
+fun Game.show(){
+    // command is only called once a game has been started already, so is running
+    check(board is BoardRun) { "not running" }
+    board.show()
+}
 
 fun Game.showScore(){
     score.entries.forEach{ (key, value) ->

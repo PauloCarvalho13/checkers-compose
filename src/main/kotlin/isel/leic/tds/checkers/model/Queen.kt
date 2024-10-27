@@ -8,42 +8,37 @@ class Queen(player: Player) : Piece(player) {
         Direction.DOWN_LEFT,
         Direction.DOWN_RIGHT
     )
-    override fun canCapture(position: Square, board: Board): Board{
-        /*val posCaptures = super.canCapture(position, board)
+
+    override fun canMove(from: Square, to:  Square, moves: Moves): Boolean {
+        val validMoves = directions.flatMap { direction ->
+            generateSequence(from) { it.move(direction) }
+                .takeWhile {
+                    moves[it] == null ||
+                            moves[it]!!.player != this.player
+                }
+                .drop(1)
+        }
+
+        return validMoves.isNotEmpty()
+    }
+
+    override fun getPossibleCaptures(from: Square, moves: Moves): Moves{
         val captureMoves = directions.flatMap { direction ->
-            val middleSquare = position.move(direction)
+            val middleSquare = from.move(direction)
             val targetSquare = middleSquare?.move(direction)
 
             if (middleSquare != null && targetSquare != null &&
-                board.playingPlaces[middleSquare]?.player != this.player &&
-                board.playingPlaces[targetSquare] == null) {
+                moves[middleSquare]?.player != this.player &&
+                moves[targetSquare] == null) {
                 listOf(targetSquare to this)
             } else {
                 emptyList()
             }
         }.toMap()
 
-        return Board(posCaptures.playingPlaces + captureMoves)
-
-         */
-        return board
+        return captureMoves.toList().sortedBy { (square, _) -> square.index }.toMap()
     }
 
-    override fun canMove(position: Square, board: Board): Board {
-
-        /*val validMoves = directions.flatMap { direction ->
-            generateSequence(position) { it.move(direction) }
-                .takeWhile {
-                    it != null &&
-                    (board.playingPlaces[it] == null ||
-                     board.playingPlaces[it]!!.player != this.player)
-                }
-                .drop(1)
-                .toList()
-        }
-        return Board(validMoves.associateWith { this })
-
-         */
-        return board
-    }
+    override fun canCapture(from: Square, to: Square, moves: Moves): Boolean =
+        getPossibleCaptures(from, moves).containsKey(to)
 }

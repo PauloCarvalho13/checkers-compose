@@ -47,104 +47,68 @@ fun Board.play(from: Square, to: Square): Board {
         return this
     }
 
-    val movesAfter = this.makePlay(from , to)
-    val nextTurn = if(moves != movesAfter) turn.other else turn
+    val boardAfter = this.makePlay(from , to)
     val winner = winner()
     return when {
-        winner != null -> BoardWin(winner, movesAfter)
-        else -> BoardRun(nextTurn, movesAfter)
+        winner != null -> BoardWin(winner, boardAfter.moves)
+        else -> boardAfter
     }
 }
 
-fun Board.makePlay(from: Square, to: Square): Moves {
+fun Board.makePlay(from: Square, to: Square): BoardRun {
     check(this is BoardRun){"Game not started"}
 
     val fromPiece = moves[from]
     requireNotNull(fromPiece) {"Invalid piece"}
 
-    val captureMoves = getAllCaptures(turn)
+    // get all possible captures
+    val captureMoves = moves.getAllCaptures(turn)
 
-    if(captureMoves.moves.isNotEmpty()){
-        if(!captureMoves.moves.containsKey(to)){
-            println("Captures available in ${captureMoves.moves.entries}, you must capture!")
-            return moves
+    // Checking if the piece is a Pawn or a Queen
+    val checkPiece = fromPiece.checkPiece(to)
+
+    // update moves with the new piece
+    // we already know it's a valid move and updateMoves() already solves both captures and simple moves, so no need to check which it is
+    val updatedMoves = moves.updateMoves(from, to, checkPiece)
+
+    // check if there are any captures available
+    if(captureMoves.isNotEmpty()){
+        // if there are but the position to is not in one of them, print the available captures and return moves as it was
+        if(!captureMoves.containsKey(to)){
+            println("Captures available in ${captureMoves.entries.map { it.key.toString() }}, you must capture!")
+            return BoardRun(turn, moves)
         }
 
-    }else{
-        //Checking if the Square to its in possibleCaptures and update board
-        // Checking if the piece is a Pawn or a Queen
-        val checkPiece = checkPiece(to, fromPiece)
-
-        val updatedMoves = moves.updateMoves(from, to, checkPiece)
-
+        // if there are still captures available print this information
         if (checkPiece.getPossibleCaptures(to, updatedMoves).isNotEmpty()) {
             println("You can play again!")
-            return updatedMoves // Turn doesn't change
-        } else {
-            // If there is no more Captures, change turn
-            return updatedMoves
+            return BoardRun(turn, updatedMoves)
         }
     }
 
-    if (fromPiece.canMove(from, to, moves)) {
-        //Checking if the piece is a Pawn or a Queen
-        val checkPiece = checkPiece(to, fromPiece)
-        // Updating the board and changing the turn
-        return moves.updateMoves(from, to, checkPiece)
-    }else{
-        // if there is no Captures -> error
-        if(!fromPiece.canCapture(from, to, moves)){
-            println("Invalid Move")
-            println("Play Again!")
-            return moves // still this turn because something went wrong
-        }else{
-
-        }
-    }
-    return moves
+    // if it's a simple move, return updatedMoves with change of turn
+    return BoardRun(turn.other, updatedMoves)
 }
 
-// TODO
 fun Board.winner(): Player? {
-    return null
-}
-
-
-fun Moves.hasNoValidPlay(): Boolean{
-    return true
-}
-
-
-fun Board.getAllCaptures(player: Player): Board {
-    val captures = buildMap<Square, Piece> {
-        moves
-            .filter { it.value.player == player }
-            .forEach { (square, piece) ->
-                val pieceCaptures = piece.getPossibleCaptures(square, moves)
-                pieceCaptures.forEach { (square, piece) ->
-                    put(square, piece)
-                }
-        }
+    val groupedMoves: Map<Player, Boolean> = Player.entries.associateWith { player ->
+        moves.values.any{ it.player == player }
     }
-    return BoardRun(player, captures)
+
+    val winningPlayer = groupedMoves.filter { !it.value }.keys.firstOrNull()
+
+    return winningPlayer
 }
 
-fun Board.checkPiece(to: Square, piece: Piece): Piece{
-    return when(piece){
-        is Pawn -> {
-            if(piece.player == Player.WHITE && to.row.digit == '8'){
-                Queen(Player.WHITE)
-            }
-            else if (piece.player == Player.BLACK && to.row.digit == '1'){
-                Queen(Player.BLACK)
-            }
-            else{
-                piece // There's no condition to change pawn to queen so it remains the same piece
-            }
+fun Moves.getAllCaptures(player: Player): Moves =
+    this
+        .filter { it.value.player == player }
+        .flatMap { (square, piece) ->
+            val pieceCaptures = piece.getPossibleCaptures(square, this)
+            if(!pieceCaptures.containsKey(square)) pieceCaptures.entries.map { it.toPair() }
+            else listOf(square to piece) + pieceCaptures.entries.map { it.toPair() }
         }
-        else -> piece // if it's already a Queen stays the same
-    }
-}
+        .toMap()
 
 fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val newMoves = this - from + (to to piece)

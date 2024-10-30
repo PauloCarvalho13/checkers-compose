@@ -26,7 +26,6 @@ fun Game.play(initPos: Square, finalPos: Square ): Game {
         board = board,
         score = when(board){
             is BoardWin  -> advanceScore(board.winner)
-            is BoardDraw -> advanceScore(null)
             is BoardRun -> score
         }
 

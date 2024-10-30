@@ -2,6 +2,7 @@ package isel.leic.tds.checkers.model
 
 import isel.leic.tds.checkers.BOARD_DIM
 import isel.leic.tds.checkers.model.Square.Companion.values
+import kotlin.math.absoluteValue
 
 class Square private constructor (val index: Int) {
     init {
@@ -20,6 +21,32 @@ class Square private constructor (val index: Int) {
             Square(it)
         }
 
+    }
+}
+
+fun Square.move(direction: Direction): Square? {
+    val newRow = this.row.index + direction.row
+    val newColumn = this.column.index + direction.column
+
+    return if (newRow in 0..<BOARD_DIM && newColumn in 0..<BOARD_DIM) {
+        Square(Row(newRow), Column(newColumn))
+    } else {
+        null
+    }
+}
+
+fun Square.getMiddleSquare(to: Square): Square? {
+    val rowDiff = (this.row.index - to.row.index).absoluteValue
+    val colDiff = (this.column.index - to.column.index).absoluteValue
+
+    // Se a diferença for de exatamente duas casas, encontramos o quadrado do meio
+    return if (rowDiff == 2 && colDiff == 2) {
+        Square(
+            Row((this.row.index + to.row.index) / 2),
+            Column((this.column.index + to.column.index) / 2)
+        )
+    } else {
+        null
     }
 }
 

@@ -18,6 +18,7 @@ class Pawn(player: Player): Piece(player) {
     //PEAO -> Posição (4,d)
     //Pode jogar em (5,c) (5,e)
 
+    // should check the from square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val directions = if (player == Player.WHITE) {
             listOf(Direction.UP_LEFT, Direction.UP_RIGHT)
@@ -69,7 +70,7 @@ class Pawn(player: Player): Piece(player) {
             } else {
                 null
             }
-        }.toMap()
+        }
 
         // the squares need to be ordered or the presentation funs will fail
         return captureMoves.toList().sortedBy { (square, _) -> square.index }.toMap()
@@ -77,31 +78,5 @@ class Pawn(player: Player): Piece(player) {
 
     override fun canCapture(from: Square, to: Square, moves: Moves): Boolean =
         getPossibleCaptures(from, moves).containsKey(to)
-}
-
-fun Square.move(direction: Direction): Square? {
-    val newRow = this.row.index + direction.row
-    val newColumn = this.column.index + direction.column
-
-    return if (newRow in 0..<BOARD_DIM && newColumn in 0..<BOARD_DIM) {
-        Square(Row(newRow), Column(newColumn))
-    } else {
-        null
-    }
-}
-
-fun Square.getMiddleSquare(to: Square): Square? {
-    val rowDiff = (this.row.index - to.row.index).absoluteValue
-    val colDiff = (this.column.index - to.column.index).absoluteValue
-
-    // Se a diferença for de exatamente duas casas, encontramos o quadrado do meio
-    return if (rowDiff == 2 && colDiff == 2) {
-        Square(
-            Row((this.row.index + to.row.index) / 2),
-            Column((this.column.index + to.column.index) / 2)
-        )
-    } else {
-        null
-    }
 }
 

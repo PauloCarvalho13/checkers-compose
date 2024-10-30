@@ -5,8 +5,8 @@ import isel.leic.tds.checkers.BOARD_DIM
 typealias Moves = Map<Square,Piece>
 
 sealed class Board(val moves: Moves)
-class BoardRun(val turn: Player, val squares: Moves = emptyMap()): Board(squares)
-class BoardWin( val winner: Player, val squares: Moves): Board(squares)
+class BoardRun(val turn: Player, squares: Moves = emptyMap()): Board(squares)
+class BoardWin( val winner: Player, squares: Moves): Board(squares)
 
 
 private val piecesPerPlayer = mapOf(8 to 12, 6 to 8,  4 to 2)

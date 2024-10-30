@@ -1,8 +1,5 @@
 package isel.leic.tds.checkers.model
 
-import isel.leic.tds.checkers.BOARD_DIM
-import kotlin.math.absoluteValue
-
 enum class Direction(val row: Int, val column: Int) {
     UP_LEFT(-1, -1), //whiteMove
     UP_RIGHT(-1, 1), //whiteMove
@@ -15,9 +12,6 @@ enum class Direction(val row: Int, val column: Int) {
 }
 
 class Pawn(player: Player): Piece(player) {
-    //PEAO -> Posição (4,d)
-    //Pode jogar em (5,c) (5,e)
-
     // should check the from square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val directions = if (player == Player.WHITE) {
@@ -25,7 +19,6 @@ class Pawn(player: Player): Piece(player) {
         } else {
             listOf(Direction.DOWN_LEFT, Direction.DOWN_RIGHT)
         }
-        //println("Posição atual: ${position.row.digit}, ${position.column.symbol}")
 
         // its already assured that the from position is valid, checked at Game.play()
         val move = directions.mapNotNull { direction ->
@@ -72,7 +65,7 @@ class Pawn(player: Player): Piece(player) {
             }
         }
 
-        // the squares need to be ordered or the presentation funs will fail
+        // the squares need to be ordered or the presentation functions will fail
         return captureMoves.toList().sortedBy { (square, _) -> square.index }.toMap()
     }
 

@@ -7,12 +7,12 @@ typealias Moves = Map<Square,Piece>
 sealed class Board(val moves: Moves)
 class BoardRun(val turn: Player, val squares: Moves = emptyMap()): Board(squares)
 class BoardWin( val winner: Player, val squares: Moves): Board(squares)
-class BoardDraw(val squares: Moves): Board(squares)
 
 
 private val piecesPerPlayer = mapOf(8 to 12, 6 to 8,  4 to 2)
 
-fun BoardRun.init(): BoardRun {
+fun Board.init(): BoardRun {
+    check(this is BoardRun){"Game not started"}
 
     val piecesPerPlayer = piecesPerPlayer[BOARD_DIM]
     checkNotNull(piecesPerPlayer){"Invalid Board size"}
@@ -29,16 +29,20 @@ fun BoardRun.init(): BoardRun {
 
 operator fun Board.get(square: Square): Piece? = moves[square]
 
-fun Board.isValidMove(piecePosition: Square, newPiecePosition: Square, turn: Player)
-        =   moves.containsKey(piecePosition)
-            && moves[piecePosition]?.player == turn
-            && (newPiecePosition.black && !moves.containsKey(newPiecePosition))
+fun Board.isValidMove(piecePosition: Square, newPiecePosition: Square): Boolean{
+    check(this is BoardRun){"Game not started"}
+    val piece = moves[piecePosition]?: return false
+    return piece.player == turn  &&
+            (piece.canMove(piecePosition, newPiecePosition, moves) ||
+             piece.canCapture(piecePosition, newPiecePosition, moves))
+}
+
 
 fun Board.play(from: Square, to: Square): Board {
     check(this is BoardRun){ "Game Over" }
     // this is now treated as a BoardRun
 
-    if(!isValidMove(from, to, turn)){
+    if(!isValidMove(from, to)){
         println("Invalid move")
         return this
     }
@@ -48,17 +52,15 @@ fun Board.play(from: Square, to: Square): Board {
     val winner = winner()
     return when {
         winner != null -> BoardWin(winner, movesAfter)
-        draw() -> BoardDraw(movesAfter)
         else -> BoardRun(nextTurn, movesAfter)
     }
 }
 
-fun BoardRun.makePlay(from: Square, to: Square): Moves {
+fun Board.makePlay(from: Square, to: Square): Moves {
+    check(this is BoardRun){"Game not started"}
+
     val fromPiece = moves[from]
-    if(fromPiece == null) {
-        println("No piece at the from position")
-        return moves
-    }
+    requireNotNull(fromPiece) {"Invalid piece"}
 
     val captureMoves = getAllCaptures(turn)
 
@@ -66,6 +68,21 @@ fun BoardRun.makePlay(from: Square, to: Square): Moves {
         if(!captureMoves.moves.containsKey(to)){
             println("Captures available in ${captureMoves.moves.entries}, you must capture!")
             return moves
+        }
+
+    }else{
+        //Checking if the Square to its in possibleCaptures and update board
+        // Checking if the piece is a Pawn or a Queen
+        val checkPiece = checkPiece(to, fromPiece)
+
+        val updatedMoves = moves.updateMoves(from, to, checkPiece)
+
+        if (checkPiece.getPossibleCaptures(to, updatedMoves).isNotEmpty()) {
+            println("You can play again!")
+            return updatedMoves // Turn doesn't change
+        } else {
+            // If there is no more Captures, change turn
+            return updatedMoves
         }
     }
 
@@ -81,21 +98,10 @@ fun BoardRun.makePlay(from: Square, to: Square): Moves {
             println("Play Again!")
             return moves // still this turn because something went wrong
         }else{
-            //Checking if the Square to its in possibleCaptures and update board
-            // Checking if the piece is a Pawn or a Queen
-            val checkPiece = checkPiece(to, fromPiece)
 
-            val updatedMoves = moves.updateMoves(from, to, checkPiece)
-
-            if (checkPiece.getPossibleCaptures(to, updatedMoves).isNotEmpty()) {
-                println("You can play again!")
-                return updatedMoves // Turn doesn't change
-            } else {
-                // If there is no more Captures, change turn
-                return updatedMoves
-            }
         }
     }
+    return moves
 }
 
 // TODO
@@ -103,9 +109,6 @@ fun Board.winner(): Player? {
     return null
 }
 
-// TODO
-fun Board.draw(): Boolean
-     = false//moves.isEmpty()  || moves.hasNoValidPlay()
 
 fun Moves.hasNoValidPlay(): Boolean{
     return true
@@ -114,13 +117,13 @@ fun Moves.hasNoValidPlay(): Boolean{
 
 fun Board.getAllCaptures(player: Player): Board {
     val captures = buildMap<Square, Piece> {
-        moves.forEach { (square, piece) ->
-            if (piece.player == player) {
+        moves
+            .filter { it.value.player == player }
+            .forEach { (square, piece) ->
                 val pieceCaptures = piece.getPossibleCaptures(square, moves)
                 pieceCaptures.forEach { (square, piece) ->
                     put(square, piece)
                 }
-            }
         }
     }
     return BoardRun(player, captures)

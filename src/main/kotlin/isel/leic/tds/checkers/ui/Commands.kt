@@ -2,57 +2,57 @@ package isel.leic.tds.checkers.ui
 
 import isel.leic.tds.checkers.model.*
 
-abstract class Command(val argsSyntax: String = "") {
-    open fun execute(args: List<String>, game: Game): Game = game
-    open fun leave(): Boolean = false
-}
 
-object PlayCommand: Command("<from> <to>") {
-
-    override fun execute(args: List<String>, game: Game): Game {
+data class Commands(
+    val argsSyntax: String = "",
+    val toTerminate: Boolean = false,
+    val execute: (args: List<String>,game: Game)-> Game
+)
+val startCommand = Commands(
+    argsSyntax = "<gameId>",
+    execute = { args, _ ->
+        require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
+        Game(gameId = args[0], board = BoardRun(turn = Player.WHITE).init(), firstPlayer = Player.WHITE)
+    }
+)
+val playCommand = Commands(
+    argsSyntax = "<from> <to>",
+    execute = { args, game ->
         check(game.board != null) { "Game not started" }
         require(args.size == 2) { "Missing position" }
-        return game.play(args[0].toSquare(), args[1].toSquare())
+        game.play(args[0].toSquare(), args[1].toSquare())
     }
-}
-
-object StartCommand: Command("<gameId>") {
-
-    override fun execute(args: List<String>, game: Game): Game {
-        require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
-        return Game(gameId = args[0], board = BoardRun(turn = Player.WHITE).init() , firstPlayer = Player.WHITE)
+)
+val exitCommand = Commands(
+    toTerminate = true,
+    execute = { _, game ->
+        game
     }
-}
-
-object GridCommand: Command(){
-
-    override fun execute(args: List<String>, game: Game): Game {
+)
+val gridCommand = Commands(
+    execute = { _, game ->
         game.show()
-        return game
+        game
     }
-}
-
-object RefreshCommand: Command(){
-    override fun execute(args: List<String>, game: Game): Game {
-        TODO("Not yet implemented")
+)
+val refreshCommand = Commands(
+    execute = { _, game ->
+        println("Refreshing game")
+        game
     }
-}
-
-object ExitCommand: Command(){
-    override fun leave(): Boolean  = true
-}
-
-object ScoreCommand: Command(){
-    override fun execute(args: List<String>, game: Game): Game =
-        game.also { it.showScore() }
-
-}
+)
+val scoreCommand = Commands(
+    execute = { _, game ->
+        game.showScore()
+        game
+    }
+)
 
 fun listOfCommands() = mapOf(
-    "START" to StartCommand,
-    "PLAY" to PlayCommand,
-    "EXIT" to ExitCommand,
-    "GRID" to GridCommand,
-    "REFRESH" to RefreshCommand,
-    "SCORE" to ScoreCommand
+    "START" to startCommand,
+    "PLAY" to playCommand,
+    "EXIT" to exitCommand,
+    "GRID" to gridCommand,
+    "REFRESH" to refreshCommand,
+    "SCORE" to scoreCommand
 )

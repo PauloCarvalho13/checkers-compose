@@ -19,7 +19,7 @@ fun main() {
         if (cmd == null) println("Unknown Command")
         else try {
             game = cmd.execute(args, game)
-            if (cmd.leave()) break
+            if (cmd.toTerminate) break
             game.show()
         }catch (e: IllegalArgumentException){
             println(e.message)

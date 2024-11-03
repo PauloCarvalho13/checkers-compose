@@ -1,5 +1,7 @@
 package isel.leic.tds.checkers.model
 
+import isel.leic.tds.checkers.BOARD_DIM
+
 
 abstract class Piece(val player: Player){
     open fun canMove(from: Square, to: Square, moves: Moves): Boolean = false
@@ -9,7 +11,7 @@ abstract class Piece(val player: Player){
     fun checkPiece(to: Square): Piece{
         return when(this){
             is Pawn -> {
-                if(player == Player.WHITE && to.row.digit == '8'){
+                if(player == Player.WHITE && to.row.digit == BOARD_DIM.digitToChar()){
                     Queen(Player.WHITE)
                 }
                 else if (player == Player.BLACK && to.row.digit == '1'){

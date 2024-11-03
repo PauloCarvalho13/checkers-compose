@@ -8,8 +8,7 @@ sealed class Board(val moves: Moves)
 class BoardRun(val turn: Player, squares: Moves = emptyMap()): Board(squares)
 class BoardWin( val winner: Player, squares: Moves): Board(squares)
 
-
-private val piecesPerPlayer = mapOf(8 to 12, 6 to 8,  4 to 2)
+private val piecesPerPlayer = mapOf(8 to 12, 6 to 6,  4 to 2)
 
 fun Board.init(): BoardRun {
     check(this is BoardRun){"Game not started"}
@@ -24,17 +23,63 @@ fun Board.init(): BoardRun {
 
     val initialBoard =
         squaresForPlayerWhite.associateWith { Pawn(Player.WHITE) } + squaresForPlayerBlack.associateWith { Pawn(Player.BLACK) }
-    return BoardRun(turn = turn, initialBoard)
+
+    var board = BoardRun(turn = turn, initialBoard)
+
+    val moves = listOf(
+        Pair("3e".toSquare(), "4f".toSquare()),
+        Pair("6f".toSquare(), "5g".toSquare()),
+        Pair("2f".toSquare(), "3e".toSquare()),
+        Pair("7g".toSquare(), "6f".toSquare()),
+        Pair("3c".toSquare(), "4b".toSquare()),
+        Pair("6b".toSquare(), "5c".toSquare()),
+        Pair("2d".toSquare(), "3c".toSquare()),
+        Pair("7a".toSquare(), "6b".toSquare()),
+        Pair("4f".toSquare(), "5e".toSquare()),
+        Pair("6d".toSquare(), "4f".toSquare()),
+        Pair("4f".toSquare(), "2d".toSquare()),
+        Pair("1c".toSquare(), "3e".toSquare()),
+        Pair("5g".toSquare(), "4f".toSquare()),
+        Pair("4b".toSquare(), "6d".toSquare()),
+        Pair("4f".toSquare(), "2d".toSquare()),
+        Pair("3g".toSquare(), "4f".toSquare()),
+        Pair("7e".toSquare(), "5c".toSquare()),
+        Pair("2h".toSquare(), "3g".toSquare()),
+        Pair("2d".toSquare(), "1c".toSquare()),
+        Pair("3c".toSquare(), "4b".toSquare()),
+        Pair("1c".toSquare(), "5g".toSquare()),
+        Pair("4b".toSquare(), "6d".toSquare()),
+        Pair("7c".toSquare(), "5e".toSquare()),
+        Pair("3g".toSquare(), "4f".toSquare()),
+        Pair("5g".toSquare(), "3e".toSquare()),
+        Pair("1e".toSquare(), "2d".toSquare()),
+        Pair("3e".toSquare(), "1c".toSquare()),
+        Pair("3a".toSquare(), "4b".toSquare()),
+        Pair("1c".toSquare(), "3a".toSquare()),
+        Pair("3a".toSquare(), "5c".toSquare()),
+        Pair("1g".toSquare(), "2f".toSquare()),
+        Pair("5c".toSquare(), "1g".toSquare()),
+        Pair("1a".toSquare(), "2b".toSquare()),
+        Pair("5e".toSquare(), "4d".toSquare()),
+        Pair("2b".toSquare(), "3c".toSquare()),
+        //Pair("4d".toSquare(), "2b".toSquare()),
+    )
+
+    for ((start, end) in moves) {
+        board = board.play(start, end) as BoardRun
+    }
+
+    return board
 }
 
 operator fun Board.get(square: Square): Piece? = moves[square]
 
-fun Board.isValidMove(piecePosition: Square, newPiecePosition: Square): Boolean{
+fun Board.isValidMove(from: Square, to: Square): Boolean{
     check(this is BoardRun){"Game not started"}
-    val piece = moves[piecePosition]?: return false
+    val piece = moves[from]?: return false
     return piece.player == turn  &&
-            (piece.canMove(piecePosition, newPiecePosition, moves) ||
-             piece.canCapture(piecePosition, newPiecePosition, moves))
+            (piece.canMove(from, to, moves) ||
+             piece.canCapture(from, to, moves))
 }
 
 
@@ -48,7 +93,7 @@ fun Board.play(from: Square, to: Square): Board {
     }
 
     val boardAfter = this.makePlay(from , to)
-    val winner = winner()
+    val winner = boardAfter.winner()
     return when {
         winner != null -> BoardWin(winner, boardAfter.moves)
         else -> boardAfter
@@ -91,13 +136,14 @@ fun Board.makePlay(from: Square, to: Square): BoardRun {
 }
 
 fun Board.winner(): Player? {
-    val groupedMoves: Map<Player, Boolean> = Player.entries.associateWith { player ->
-        moves.values.any{ it.player == player }
+    val white = moves.values.any { it.player == Player.WHITE }
+    val black = moves.values.any { it.player == Player.BLACK }
+
+    return when{
+        white && !black -> Player.WHITE
+        !white && black -> Player.BLACK
+        else -> null
     }
-
-    val winningPlayer = groupedMoves.filter { !it.value }.keys.firstOrNull()
-
-    return winningPlayer
 }
 
 fun Moves.getAllCaptures(player: Player): Moves =
@@ -113,9 +159,15 @@ fun Moves.getAllCaptures(player: Player): Moves =
 fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val newMoves = this - from + (to to piece)
 
-    val middleSquare = from.getMiddleSquare(to)
-    return if (middleSquare != null)
-        newMoves - middleSquare // Remove the piece that was captured
+    val fromPiece = this[from] ?: return this
+
+    val capturedSquare = if(fromPiece.canCapture(from, to, this)){
+        val reverseDirection = reverseDirectionOfMove(from, to)
+        to.move(reverseDirection)
+    } else null
+
+    return if (capturedSquare != null)
+        newMoves - capturedSquare // Remove the piece that was captured
     else
         newMoves
 }

@@ -20,6 +20,9 @@ fun Game.new() = Game(
 
 fun Game.play(initPos: Square, finalPos: Square ): Game {
     checkNotNull(board){"No board"}
+    if(board is BoardWin){
+        return this
+    }
     board as BoardRun
     val board = board.play(initPos, finalPos)
     return copy(

@@ -20,7 +20,6 @@ fun main() {
         else try {
             game = cmd.execute(args, game)
             if (cmd.toTerminate) break
-            game.show()
         }catch (e: IllegalArgumentException){
             println(e.message)
         }catch (e:IllegalStateException){

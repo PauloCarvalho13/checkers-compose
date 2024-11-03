@@ -40,11 +40,11 @@ fun Board.show() {
 
         print("|")
         when(row){
-            8 -> {
+            BOARD_DIM -> {
                 if (this is BoardRun)
                     print("  Turn = ${turn.symbol}")
             }
-            7 -> {
+            BOARD_DIM-1 -> {
                 if(this is BoardRun)
                     print("  Player = ${turn.symbol} (this is turn cuz we are yet to save the which player it is)")
             }
@@ -61,9 +61,10 @@ fun Board.show() {
 }
 
 fun Game.show(){
-    // command is only called once a game has been started already, so is running
-    check(board is BoardRun) { "not running" }
+    checkNotNull(board){"No board created"}
     board.show()
+    if (board is BoardWin)
+        println("Game is Over. ${board.winner} won")
 }
 
 fun Game.showScore(){

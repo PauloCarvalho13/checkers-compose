@@ -1,32 +1,12 @@
 package isel.leic.tds.checkers.model
 
-enum class Direction(val row: Int, val column: Int) {
-    UP_LEFT(-1, -1), //whiteMove
-    UP_RIGHT(-1, 1), //whiteMove
-    DOWN_LEFT(1, -1), //blackMove
-    DOWN_RIGHT(1, 1), //blackMove
-    UP_LEFT_CAP(2, -2),
-    UP_RIGHT_CAP(2, 2),
-    DOWN_LEFT_CAP(-2, -2),
-    DOWN_RIGHT_CAP(-2, 2)
-}
-
 class Pawn(player: Player): Piece(player) {
     // should check the from square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
-        val directions = if (player == Player.WHITE) {
-            listOf(Direction.UP_LEFT, Direction.UP_RIGHT)
-        } else {
-            listOf(Direction.DOWN_LEFT, Direction.DOWN_RIGHT)
-        }
-
+        val direction = directionOfMove(from, to)
         // its already assured that the from position is valid, checked at Game.play()
-        val move = directions.mapNotNull { direction ->
-            from.move(direction)?.takeIf { newSquare ->
-                newSquare == to && moves[newSquare] == null
-            }
-        }
-        return move.isNotEmpty()
+        val newSquare = from.move(direction)
+        return newSquare == to && moves[newSquare] == null
     }
 
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
@@ -40,7 +20,6 @@ class Pawn(player: Player): Piece(player) {
         val captureMoves = captureDirections.mapNotNull { direction ->
             val targetSquare = from.move(direction)
             val middleSquare = targetSquare?.let { from.getMiddleSquare(it) }
-
             // State of piece in MiddleSquare, if null there's no piece then we cant capture, but we can move
             // Needs to be different from the player who is playing
             // TargetSquare needs to be null, this means that the square is valid and is "empty" (no piece)
@@ -53,10 +32,7 @@ class Pawn(player: Player): Piece(player) {
                     middleSquarePiece.player != player &&
                     targetSquarePiece == null
                 ) {
-                    val fromPiece = moves[from]
-                    if(fromPiece is Pawn)
-                        targetSquare to Pawn(fromPiece.player)
-                    else targetSquare to Queen(fromPiece!!.player) // we know that fromPiece.player is not null
+                    targetSquare to moves[from]!! // moves[from] was checked to not be null before
                 } else {
                     null
                 }
@@ -66,7 +42,7 @@ class Pawn(player: Player): Piece(player) {
         }
 
         // the squares need to be ordered or the presentation functions will fail
-        return captureMoves.toList().sortedBy { (square, _) -> square.index }.toMap()
+        return captureMoves.sortedBy { (square, _) -> square.index }.toMap()
     }
 
     override fun canCapture(from: Square, to: Square, moves: Moves): Boolean =

@@ -12,7 +12,9 @@ val startCommand = Commands(
     argsSyntax = "<gameId>",
     execute = { args, _ ->
         require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
-        Game(gameId = args[0], board = BoardRun(turn = Player.WHITE).init(), firstPlayer = Player.WHITE)
+        val game = Game(gameId = args[0], board = BoardRun(turn = Player.WHITE).init(), firstPlayer = Player.WHITE)
+        game.show()
+        game
     }
 )
 val playCommand = Commands(
@@ -20,7 +22,9 @@ val playCommand = Commands(
     execute = { args, game ->
         check(game.board != null) { "Game not started" }
         require(args.size == 2) { "Missing position" }
-        game.play(args[0].toSquare(), args[1].toSquare())
+        val newGame = game.play(args[0].toSquare(), args[1].toSquare())
+        newGame.show()
+        newGame
     }
 )
 val exitCommand = Commands(
@@ -38,6 +42,7 @@ val gridCommand = Commands(
 val refreshCommand = Commands(
     execute = { _, game ->
         println("Refreshing game")
+        game.show()
         game
     }
 )

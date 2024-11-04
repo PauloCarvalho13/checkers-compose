@@ -4,6 +4,10 @@ import isel.leic.tds.checkers.BOARD_DIM
 
 
 abstract class Piece(val player: Player){
+    override fun equals(other: Any?): Boolean =
+        other is Piece && player == other.player
+    override fun hashCode() = player.hashCode()
+    abstract val type: String
     open fun canMove(from: Square, to: Square, moves: Moves): Boolean = false
     open fun canCapture(from: Square, to: Square, moves: Moves): Boolean = false
     open fun getPossibleCaptures(from: Square, moves: Moves): Moves = moves

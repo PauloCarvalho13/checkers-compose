@@ -1,17 +1,19 @@
 package isel.leic.tds.checkers
 
 import isel.leic.tds.checkers.model.Game
+import isel.leic.tds.checkers.model.GameSerializer
+import isel.leic.tds.checkers.storage.TextFileStorage
 import isel.leic.tds.checkers.ui.listOfCommands
 import isel.leic.tds.checkers.ui.readLineCommand
-import isel.leic.tds.checkers.ui.show
+
 
 const val BOARD_DIM = 8
 
 
 fun main() {
     var game = Game()
-
-    val cmds = listOfCommands()
+    val storage = TextFileStorage<String,Game>("games", GameSerializer)
+    val cmds = listOfCommands(storage)
 
     while (true){
         val (name, args) = readLineCommand()

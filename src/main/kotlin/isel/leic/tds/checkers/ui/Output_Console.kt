@@ -3,7 +3,11 @@ package isel.leic.tds.checkers.ui
 import isel.leic.tds.checkers.BOARD_DIM
 import isel.leic.tds.checkers.model.*
 
-fun Board.show() {
+fun Clash.showScore() = (this as? ClashRun)?.game?.showScore()
+
+fun Clash.show() = (this as? ClashRun)?.game?.show(sidePlayer)
+
+fun Board.show(player: Player) {
     print("  ")
     println()
 
@@ -42,11 +46,11 @@ fun Board.show() {
         when(row){
             BOARD_DIM -> {
                 if (this is BoardRun)
-                    print("  Turn = ${turn.symbol}")
+                    print("  Turn = ${this.turn}")
             }
             BOARD_DIM-1 -> {
                 if(this is BoardRun)
-                    print("  Player = ${turn.symbol} (this is turn cuz we are yet to save the which player it is)")
+                    print("  Player = ${player.name} ")
             }
         }
         println()
@@ -60,9 +64,9 @@ fun Board.show() {
     println("")
 }
 
-fun Game.show(){
+fun Game.show(player: Player ){
     checkNotNull(board){"No board created"}
-    board.show()
+    board.show(player)
     if (board is BoardWin)
         println("Game is Over. ${board.winner} won")
 }

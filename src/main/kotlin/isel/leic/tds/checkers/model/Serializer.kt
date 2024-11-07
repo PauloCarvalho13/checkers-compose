@@ -31,7 +31,7 @@ object GameSerializer: Serializer<Game>{
 
 }
 
-//RUN WHITE | 2a:Pawn:WHITE 8b:Queen:BLACK
+//RUN WHITE | 2a:P:WHITE 8b:Q:BLACK
 object BoardSerializer: Serializer<Board> {
     override fun serialize(data: Board): String =
         when(data) {

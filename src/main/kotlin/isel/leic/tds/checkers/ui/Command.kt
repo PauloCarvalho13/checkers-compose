@@ -7,74 +7,49 @@ import isel.leic.tds.checkers.model.*
 data class Command(
     val argsSyntax: String = "",
     val toTerminate: Boolean = false,
-    val execute: (args: List<String>,game: Game)-> Game = { _,game -> game }
-)
-
-
-val startCommand = Command(
-    argsSyntax = "<gameId>",
-    execute = { args, _ ->
-        require(args.size == 1 && args[0].isNotEmpty()) { "Missing GameId" }
-        val game = Game(gameId = args[0], board = BoardRun(turn = Player.WHITE).init(), firstPlayer = Player.WHITE)
-        game.show()
-        game
-    }
+    val execute: (args: List<String>, clash: Clash)-> Clash = { _, clash -> clash }
 )
 
 val playCommand = Command(
     argsSyntax = "<from> <to>",
-    execute = { args, game ->
-        check(game.board != null) { "Game not started" }
+    execute = { args, clash  ->
         require(args.size == 2) { "Missing position" }
-        val newGame = game.play(args[0].toSquare(), args[1].toSquare())
-        newGame.show()
-        newGame
+        clash.play(args[0].toSquare(), args[1].toSquare())
     }
 )
 
 val exitCommand = Command(
-    toTerminate = true,
-    execute = { _, game ->
-        game
-    }
+    toTerminate = true
 )
 
 val gridCommand = Command(
-    execute = { _, game ->
-        game.show()
-        game
+    execute = { _, clash ->
+        clash.also { it.show() }
     }
 )
 
 val refreshCommand = Command(
-    execute = { _, game ->
-        println("Refreshing game")
-        game.show()
-        game
+    execute = { _, clash ->
+        clash.refresh()
     }
 )
 
 val scoreCommand = Command(
-    execute = { _, game ->
-        game.showScore()
-        game
+    execute = { _, clash ->
+        clash.also { it.showScore() }
     }
 )
 
-fun storageCommand(fx: (name: String, Game)->Game) = Command("<name>") { args, game ->
-    val name = requireNotNull(args.firstOrNull()) {"Missing name"}
-    fx(name, game)
+fun nameCmd(fx: Clash.(Name)-> Clash) = Command("<name>") { args, clash ->
+    val arg = requireNotNull(args.firstOrNull()) { "Missing name" }
+    clash.fx(Name(arg))
 }
 
-fun listOfCommands(storage: Storage<String,Game>) = mapOf(
-    "START" to startCommand,
+fun listOfCommands() = mapOf(
+    "START" to nameCmd(Clash::start),
     "PLAY" to playCommand,
     "EXIT" to exitCommand,
     "GRID" to gridCommand,
     "REFRESH" to refreshCommand,
-    "SCORE" to scoreCommand,
-    "SAVE" to  storageCommand { name, game -> game.also{
-        if (storage.read(name)!=null) storage.update(name,game) else storage.create(name,game)
-    } },
-    "LOAD" to storageCommand {name, _ -> checkNotNull(storage.read(name)) }
+    "SCORE" to scoreCommand
 )

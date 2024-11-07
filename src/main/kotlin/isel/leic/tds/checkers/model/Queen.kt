@@ -35,80 +35,58 @@ class Queen(player: Player) : Piece(player) {
         // canCapture for every direction
         // but does it check for every square
         // from my position, do canCapture to from.move(direction) until it reaches the end of the board for every direction
+        val fromPiece = moves[from] ?: return emptyMap()
 
-        val fromPiece = moves[from] ?: return emptyMap<Square, Piece>()
+        // Helper function for recursive traversal in a direction
+        tailrec fun findCaptures(
+            currentSquare: Square?,
+            direction: Direction,
+            captures: MutableList<Square> = mutableListOf()
+        ): List<Square> {
+            // Base case: stop if the current square is null (board boundary) or if conditions aren't met
+            if (currentSquare == null) return captures
 
-        return directions.flatMap { direction ->
-            generateSequence(from.move(direction)) { currentSquare ->
-                // Move to the next square in the given direction
-                currentSquare.move(direction)
+            val nextSquare = currentSquare.move(direction)
+            return if (moves[currentSquare] == null || (nextSquare != null && canCapture(from, nextSquare, moves))) {
+                // Accumulate valid captures and continue
+                if (nextSquare != null && canCapture(from, nextSquare, moves)) {
+                    captures.add(nextSquare)
+                }
+                findCaptures(nextSquare, direction, captures)
+            } else {
+                captures
             }
-                .takeWhile { currentSquare ->
-                    // Stop the sequence if we encounter a square that cannot be captured
-                    //moves[currentSquare] == null || canCapture(from, currentSquare.move(direction) ?: return@takeWhile false, moves)
-                    if (currentSquare == null) {
-                        false // Stop if we reach the board boundary
-                    } else {
-                        val nextSquare = currentSquare.move(direction)
-                        // Continue if the square is empty, or if the next square allows capture
-                        moves[currentSquare] == null || (nextSquare != null && canCapture(from, nextSquare, moves))
-                    }
-                }
-                .mapNotNull { currentSquare ->
-                    // Only include squares that can actually be captured
-                    val nextSquare = currentSquare.move(direction)
-                    if (nextSquare != null && canCapture(from, nextSquare, moves)) nextSquare else null
-                }
         }
-            .distinct()
+
+        // Accumulate captures for all directions
+        return directions.flatMap { direction ->
+            findCaptures(from.move(direction), direction)
+        }
             .sortedBy { it.index }
             .associateWith { fromPiece }
-
-       /* val possibleCaptures = mutableListOf<Square>()
-
-        for (direction in directions) {
-            var currentSquare = from.move(direction)
-
-            while (currentSquare != null) {
-                val nextSquare = currentSquare.move(direction)
-                if (moves[currentSquare] == null) {
-                    // If the current square is empty, continue moving in this direction
-                    currentSquare = currentSquare.move(direction)
-                } else if (nextSquare != null && canCapture(from, nextSquare, moves)) {
-                    // If canCapture is true, add to possible captures and continue moving
-                    possibleCaptures.add(nextSquare)
-                    currentSquare = nextSquare
-                } else {
-                    // If the square is occupied and cannot be captured, stop in this direction
-                    break
-                }
-            }
-        }
-
-        return possibleCaptures.toList().sortedBy { square -> square.index }.associateWith { fromPiece }*/
     }
 
     override fun canCapture(from: Square, to: Square, moves: Moves): Boolean {
         // get the piece that is moving, if its empty return false
         val fromPiece = moves[from] ?: return false
 
-        // see if the target square is empty, if its not null return false
+        // see if the target square is empty, if it's not null return false
         moves[to]?.let { return false }
 
         // get the reverse direction to move to the previous square
-        val reverseDirection = reverseDirectionOfMove(from, to)
+        val reverseDirection = directionOfMove(to, from)
 
         // see if the square before targetSquare has an opposing piece, if its empty return false
         val capturedSquare = to.move(reverseDirection) ?: return false
 
         val capturedPiece = moves[capturedSquare] ?: return false
 
-        // check if its a piece from the same player, if it is, return false
+        // check if it's a piece from the same player, if it is, return false
         if(capturedPiece.player == fromPiece.player) return false
 
         val squareBeforeCaptured = capturedSquare.move(reverseDirection) ?: return false
 
         // see if the piece can move until the capturedPiece square, if it can, the capture is successful
-        return (squareBeforeCaptured == from || canMove(from, squareBeforeCaptured, moves))
+        return (squareBeforeCaptured == from || canMove (from, squareBeforeCaptured, moves))
     }
 }

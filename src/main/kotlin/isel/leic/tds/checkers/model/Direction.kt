@@ -22,14 +22,3 @@ fun directionOfMove(from: Square, to: Square): Direction{
         else -> Direction.DOWN_LEFT
     }
 }
-
-fun reverseDirectionOfMove(from: Square, to: Square): Direction{
-    val rowDiff = to.row.index - from.row.index
-    val colDiff = to.column.index - from.column.index
-    return when {
-        rowDiff > 0 && colDiff < 0 -> Direction.UP_RIGHT
-        rowDiff > 0 && colDiff > 0 -> Direction.UP_LEFT
-        rowDiff < 0 && colDiff < 0 -> Direction.DOWN_RIGHT
-        else -> Direction.DOWN_LEFT
-    }
-}

@@ -44,20 +44,22 @@ class Queen(player: Player) : Piece(player) {
         tailrec fun findCaptures(
             currentSquare: Square?,
             direction: Direction,
-            captures: MutableList<Square> = mutableListOf()
+            captured: List<Square> = emptyList()
         ): List<Square> {
             // Base case: stop if the current square is null (board boundary) or if conditions aren't met
-            if (currentSquare == null) return captures
+            if (currentSquare == null) return captured
 
             val nextSquare = currentSquare.move(direction)
             return if (moves[currentSquare] == null || (nextSquare != null && canCapture(from, nextSquare, moves))) {
-                // Accumulate valid captures and continue
-                if (nextSquare != null && canCapture(from, nextSquare, moves)) {
-                    captures.add(nextSquare)
+                // Continue and accumulate in the result list without mutability
+                val newCaptured = if (nextSquare != null && canCapture(from, nextSquare, moves)) {
+                    captured + nextSquare
+                } else {
+                    captured
                 }
-                findCaptures(nextSquare, direction, captures)
+                findCaptures(nextSquare, direction, newCaptured)
             } else {
-                captures
+                captured
             }
         }
 

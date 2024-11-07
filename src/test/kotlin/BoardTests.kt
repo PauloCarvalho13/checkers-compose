@@ -1,8 +1,6 @@
 import isel.leic.tds.checkers.model.*
-import isel.leic.tds.checkers.ui.show
 import kotlin.test.Test
 import kotlin.test.assertEquals
-import kotlin.test.assertFailsWith
 import kotlin.test.assertTrue
 
 private val gettingBlackQueenSequence = listOf(
@@ -99,13 +97,9 @@ class BoardTests {
 
         assertEquals(boardBefore, boardAfter)
     }
-    /*@Test fun `test playing after game over`() {
-        val board = playSequence(2, 1, 4, 3, 6)
+    @Test fun `test win game`() {
+        val board = playSequence(blackWinningSequence)
         assertTrue(board is BoardWin)
-        val ex = assertFailsWith<IllegalStateException> {
-            board.play()
-        }
-        assertEquals("Game is over", ex.message)
-    }*/
+    }
 
 }

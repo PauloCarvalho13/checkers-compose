@@ -1,6 +1,9 @@
 package isel.leic.tds.checkers.model
 
 class Pawn(player: Player): Piece(player) {
+    override val type: String
+        get() = "P"
+
     // should check the from square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val direction = directionOfMove(from, to)

@@ -9,6 +9,9 @@ class Queen(player: Player) : Piece(player) {
         Direction.DOWN_RIGHT
     )
 
+    override val type: String
+        get() = "Q"
+
     override fun canMove(from: Square, to:  Square, moves: Moves): Boolean {
         val direction = directionOfMove(from, to)
         val validSquares = mutableListOf<Square>()

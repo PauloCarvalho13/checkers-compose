@@ -17,7 +17,7 @@ object GameSerializer: Serializer<Game>{
     override fun deserialize(text: String): Game {
         val parts = text.split("\n")
         return Game(
-            board = if (parts.size==3) null else BoardSerializer.deserialize(parts[3]),
+            board = if (parts.size==4) null else BoardSerializer.deserialize(parts[3]),
             firstPlayer =  Player.valueOf(parts[2]),
             score = parts[1].split(" ")
                 .map { it.split(":") }

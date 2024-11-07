@@ -1,6 +1,6 @@
 package isel.leic.tds.checkers.storage
 
-import java.io.IOException
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import kotlin.io.path.*
 
@@ -27,7 +27,6 @@ class TextFileStorage<Key, Data: Any>(
     }
 
     override fun read(key: Key): Data?  = withPath(key) {
-        //if(!exists()) return@withPath null// to return null if the file does not exist
         try { serializer.deserialize(readText()) }
         catch (e: NoSuchFileException) { null }
     }

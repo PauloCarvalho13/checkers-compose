@@ -2,7 +2,7 @@ package isel.leic.tds.checkers.model
 
 import isel.leic.tds.checkers.storage.Storage
 import isel.leic.tds.checkers.ui.show
-import isel.leic.tds.checkers.ui.showScore
+
 
 @JvmInline
 value class Name(private val value: String) {

@@ -25,11 +25,6 @@ private val gettingBlackQueenSequence = listOf(
     Pair("7e".toSquare(), "5c".toSquare()),
     Pair("2h".toSquare(), "3g".toSquare()),
     Pair("2d".toSquare(), "1c".toSquare()),
-    Pair("3c".toSquare(), "4b".toSquare()),
-    Pair("1c".toSquare(), "5g".toSquare()),
-    Pair("4b".toSquare(), "6d".toSquare()),
-    Pair("7c".toSquare(), "5e".toSquare()),
-    Pair("3g".toSquare(), "4f".toSquare()),
 )
 
 private val blackWinningSequence = listOf(

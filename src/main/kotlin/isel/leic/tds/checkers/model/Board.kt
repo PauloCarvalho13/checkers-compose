@@ -30,52 +30,7 @@ fun Board.init(): BoardRun {
     val initialBoard =
         squaresForPlayerWhite.associateWith { Pawn(Player.WHITE) } + squaresForPlayerBlack.associateWith { Pawn(Player.BLACK) }
 
-    var board = BoardRun(turn = turn, initialBoard)
-
-    val moves = listOf(
-        Pair("3e".toSquare(), "4f".toSquare()),
-        Pair("6f".toSquare(), "5g".toSquare()),
-        Pair("2f".toSquare(), "3e".toSquare()),
-        Pair("7g".toSquare(), "6f".toSquare()),
-        Pair("3c".toSquare(), "4b".toSquare()),
-        Pair("6b".toSquare(), "5c".toSquare()),
-        Pair("2d".toSquare(), "3c".toSquare()),
-        Pair("7a".toSquare(), "6b".toSquare()),
-        Pair("4f".toSquare(), "5e".toSquare()),
-        Pair("6d".toSquare(), "4f".toSquare()),
-        Pair("4f".toSquare(), "2d".toSquare()),
-        Pair("1c".toSquare(), "3e".toSquare()),
-        Pair("5g".toSquare(), "4f".toSquare()),
-        Pair("4b".toSquare(), "6d".toSquare()),
-        Pair("4f".toSquare(), "2d".toSquare()),
-        Pair("3g".toSquare(), "4f".toSquare()),
-        Pair("7e".toSquare(), "5c".toSquare()),
-        Pair("2h".toSquare(), "3g".toSquare()),
-        Pair("2d".toSquare(), "1c".toSquare()),
-        Pair("3c".toSquare(), "4b".toSquare()),
-        Pair("1c".toSquare(), "5g".toSquare()),
-        Pair("4b".toSquare(), "6d".toSquare()),
-        Pair("7c".toSquare(), "5e".toSquare()),
-        Pair("3g".toSquare(), "4f".toSquare()),
-        Pair("5g".toSquare(), "3e".toSquare()),
-        Pair("1e".toSquare(), "2d".toSquare()),
-        Pair("3e".toSquare(), "1c".toSquare()),
-        Pair("3a".toSquare(), "4b".toSquare()),
-        Pair("1c".toSquare(), "3a".toSquare()),
-        Pair("3a".toSquare(), "5c".toSquare()),
-        Pair("1g".toSquare(), "2f".toSquare()),
-        Pair("5c".toSquare(), "1g".toSquare()),
-        Pair("1a".toSquare(), "2b".toSquare()),
-        Pair("5e".toSquare(), "4d".toSquare()),
-        Pair("2b".toSquare(), "3c".toSquare()),
-        //Pair("4d".toSquare(), "2b".toSquare()),
-    )
-
-    for ((start, end) in moves) {
-        board = board.play(start, end) as BoardRun
-    }
-
-    return board
+    return BoardRun(turn, initialBoard)
 }
 
 operator fun Board.get(square: Square): Piece? = moves[square]

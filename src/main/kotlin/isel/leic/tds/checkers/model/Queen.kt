@@ -12,25 +12,18 @@ class Queen(player: Player) : Piece(player) {
     override val type: String
         get() = "Q"
 
-    override fun canMove(from: Square, to:  Square, moves: Moves): Boolean {
+    override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val direction = directionOfMove(from, to)
-        val validSquares = mutableListOf<Square>()
-        var currentSquare: Square? = from
 
-        while (true) {
-            currentSquare = currentSquare?.move(direction) ?: return false
-            if (moves[currentSquare] != null || currentSquare == to) {
-                break
+        tailrec fun findPathToSquare(currentSquare: Square?): Boolean =
+            when {
+                currentSquare == null -> false
+                currentSquare == to -> true
+                moves[currentSquare] != null -> false
+                else -> findPathToSquare(currentSquare.move(direction))
             }
-            validSquares.add(currentSquare)
-        }
 
-        // get the last square and move it, so getting the to Square or an occupied square
-        val toSquareOnBoard = if(validSquares.isEmpty()) from.move(direction)
-                              else validSquares.last().move(direction)
-
-        // check if that square is empty and that it is the same as to
-        return moves[toSquareOnBoard] == null && toSquareOnBoard == to
+        return findPathToSquare(from.move(direction))
     }
 
     // gets all the possible captures of a piece
@@ -51,7 +44,6 @@ class Queen(player: Player) : Piece(player) {
 
             val nextSquare = currentSquare.move(direction)
             return if (moves[currentSquare] == null || (nextSquare != null && canCapture(from, nextSquare, moves))) {
-                // Continue and accumulate in the result list without mutability
                 val newCaptured = if (nextSquare != null && canCapture(from, nextSquare, moves)) {
                     captured + nextSquare
                 } else {

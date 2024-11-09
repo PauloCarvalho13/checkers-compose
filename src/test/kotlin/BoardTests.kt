@@ -80,11 +80,11 @@ class BoardTests {
     fun `test getting a Queen as BLACK`() {
 
         val board = playSequence(gettingBlackQueenSequence)
-        //board.show()
         assertTrue(board.moves["1c".toSquare()] is Queen)
     }
 
-    @Test fun `test invalid move`() {
+    @Test
+    fun `test invalid move`() {
         val boardBefore = playSequence(
             listOf(
                 Pair("3e".toSquare(), "4f".toSquare()),
@@ -97,9 +97,58 @@ class BoardTests {
 
         assertEquals(boardBefore, boardAfter)
     }
-    @Test fun `test win game`() {
+    @Test
+    fun `test win game`() {
         val board = playSequence(blackWinningSequence)
         assertTrue(board is BoardWin)
     }
 
+    @Test
+    fun `try make a move when you have available captures`(){
+        val board = playSequence(
+            listOf(
+                Pair("3c".toSquare() , "4d".toSquare()),
+                Pair("6f".toSquare(), "5e".toSquare()),
+                Pair("4d".toSquare(), "5c".toSquare())
+            )
+        )
+        val expectBoard = playSequence(
+            listOf(
+                Pair("3c".toSquare() , "4d".toSquare()),
+                Pair("6f".toSquare(), "5e".toSquare()),
+            )
+        )
+        assertEquals(expectBoard, board)
+    }
+
+    @Test
+    fun `test queen capture`(){
+        val board = playSequence(gettingBlackQueenSequence)
+            .play("3c".toSquare(), "4b".toSquare())
+            .play("1c".toSquare(), "5g".toSquare())
+        assertEquals(Queen(Player.BLACK), board.moves["5g".toSquare()])
+    }
+
+    @Test
+    fun `try queen multiple capture`(){
+        val board = playSequence(gettingBlackQueenSequence)
+            .play("1e".toSquare(), "2d".toSquare())
+
+        val nextBoard = board.play("1c".toSquare(), "5g".toSquare())
+
+        //Board are the same because the capture is invalid so the board isn´t updated
+        assertEquals(nextBoard, board)
+
+        val boardAfterQueenCaptures = board.play("1c".toSquare(), "3e".toSquare())
+            .play("3e".toSquare(), "5g".toSquare())
+        assertEquals(Queen(Player.BLACK), boardAfterQueenCaptures["5g".toSquare()])
+
+    }
+
+    @Test
+    fun `queen move through the board `(){
+        val board = playSequence(blackWinningSequence.dropLast(3))
+            .play("1g".toSquare(), "5c".toSquare())
+        assertEquals(Queen(Player.BLACK), board["5c".toSquare()])
+    }
 }

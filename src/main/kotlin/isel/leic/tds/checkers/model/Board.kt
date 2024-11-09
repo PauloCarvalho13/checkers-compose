@@ -28,7 +28,8 @@ fun Board.init(): BoardRun {
     val squaresForPlayerWhite = blackSquares.takeLast(piecesPerPlayer)
 
     val initialBoard =
-        squaresForPlayerWhite.associateWith { Pawn(Player.WHITE) } + squaresForPlayerBlack.associateWith { Pawn(Player.BLACK) }
+        squaresForPlayerWhite.associateWith { Pawn(Player.WHITE) } +
+                squaresForPlayerBlack.associateWith { Pawn(Player.BLACK) }
 
     return BoardRun(turn, initialBoard)
 }
@@ -39,8 +40,7 @@ fun Board.isValidMove(from: Square, to: Square): Boolean{
     check(this is BoardRun){"Game not started"}
     val piece = moves[from]?: return false
     return piece.player == turn  &&
-            (piece.canMove(from, to, moves) ||
-             piece.canCapture(from, to, moves))
+            ( piece.canCapture(from, to, moves) || piece.canMove(from, to, moves))
 }
 
 
@@ -118,9 +118,9 @@ fun Moves.getAllCaptures(player: Player): Moves =
         .toMap()
 
 fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
-    val newMoves = this - from + (to to piece)
-
     val fromPiece = this[from] ?: return this
+
+    val newMoves = this - from + (to to piece)
 
     val capturedSquare = if(fromPiece.canCapture(from, to, this)){
         val reverseDirection = directionOfMove(to, from)

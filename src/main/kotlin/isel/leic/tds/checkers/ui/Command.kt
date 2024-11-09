@@ -1,6 +1,5 @@
 package isel.leic.tds.checkers.ui
 
-import isel.leic.tds.checkers.storage.Storage
 import isel.leic.tds.checkers.model.*
 
 

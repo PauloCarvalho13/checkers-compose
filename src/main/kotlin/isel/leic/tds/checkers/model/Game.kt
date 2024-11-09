@@ -23,7 +23,6 @@ fun Game.play(initPos: Square, finalPos: Square ): Game {
     if(board is BoardWin){
         return this
     }
-    board as BoardRun
     val board = board.play(initPos, finalPos)
     return copy(
         board = board,

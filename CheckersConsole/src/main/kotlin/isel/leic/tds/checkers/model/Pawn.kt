@@ -5,9 +5,9 @@ class Pawn(player: Player): Piece(player) {
 
     // should check the from square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
-        val direction = directionOfMove(from, to)
+        val direction = directionOfMove(from, to, moves)
         // its already assured that the from position is valid, checked at Game.play()
-        return from.move(direction) == to && moves[to] == null
+        return direction != Direction.UNKNOWN && from.move(direction) == to && moves[to] == null
     }
 
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
@@ -43,6 +43,7 @@ class Pawn(player: Player): Piece(player) {
         }
 
         // the squares need to be ordered or the presentation functions will fail
+        println("Capturas: $captureMoves")
         return captureMoves.sortedBy { (square, _) -> square.index }.toMap()
     }
 

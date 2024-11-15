@@ -123,7 +123,7 @@ fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val newMoves = this - from + (to to piece)
 
     val capturedSquare = if(fromPiece.canCapture(from, to, this)){
-        val reverseDirection = directionOfMove(to, from)
+        val reverseDirection = directionOfMove(to, from, this)
         to.move(reverseDirection)
     } else null
 

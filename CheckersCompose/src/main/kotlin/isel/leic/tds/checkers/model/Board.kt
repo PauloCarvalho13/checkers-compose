@@ -69,6 +69,7 @@ fun Board.makePlay(from: Square, to: Square): BoardRun {
 
     // get all possible captures
     val captureMoves = moves.getAllCaptures(turn)
+    println("Capture: $captureMoves")
 
     // Checking if the piece is a Pawn or a Queen
     val checkPiece = fromPiece.checkPiece(to)
@@ -76,6 +77,7 @@ fun Board.makePlay(from: Square, to: Square): BoardRun {
     // update moves with the new piece
     // we already know it's a valid move and updateMoves() already solves both captures and simple moves, so no need to check which it is
     val updatedMoves = moves.updateMoves(from, to, checkPiece)
+    println("Updated: $updatedMoves")
 
     // check if there are any captures available
     if(captureMoves.isNotEmpty()){
@@ -123,8 +125,7 @@ fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val newMoves = this - from + (to to piece)
 
     val capturedSquare = if(fromPiece.canCapture(from, to, this)){
-        val reverseDirection = directionOfMove(to, from)
-        to.move(reverseDirection)
+        from.getMiddleSquare(to)
     } else null
 
     return if (capturedSquare != null)

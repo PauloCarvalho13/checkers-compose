@@ -1,0 +1,42 @@
+@startuml
+
+skinparam componentStyle rectangle
+
+package ui {
+  [Commands]
+  [Input_Console]
+  [Output_Console]
+}
+
+package model {
+' Relações de Coesão
+[Square] ..> [Row]
+[Square] ..> [Column]
+[Piece] ..> [Player]
+[Piece] ..> [Square]
+[Piece] ..> [Moves]
+[Pawn] ..> [Piece]
+[Pawn] ..> [Direction]
+[Queen] ..> [Piece]
+[Queen] ..> [Direction]
+[Board] ..> [Piece]
+[Board] ..> [Square]
+[Board] ..> [Moves]
+[Board] ..> [Player]
+[Game] ..> [Board]
+[Game] ..> [Player]
+[Game] ..> [Square]
+[Game] ..> [Score]
+}
+
+' Relações de Acoplamento
+[Main] --> [Game]
+[Main] --> [Commands]
+[Main] --> [Input_Console]
+[Main] --> [Output_Console]
+[Commands] --> [Game]
+[Output_Console] --> [Game]
+[Output_Console] --> [Board]
+'apenas pq tambme tem a função intermédia Board.show
+
+@enduml

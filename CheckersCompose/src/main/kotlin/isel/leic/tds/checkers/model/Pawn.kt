@@ -20,7 +20,7 @@ class Pawn(player: Player): Piece(player) {
         //Valid Moves to Capture if there is a piece different then ours in the middle of our targetSquare
         val captureMoves = captureDirections.mapNotNull { direction ->
             val targetSquare = from.move(direction)
-            val middleSquare = targetSquare?.let { from.getMiddleSquare(it) }
+            val middleSquare = targetSquare?.let { from.getMiddleSquare(it,moves) }
             // State of piece in MiddleSquare, if null there's no piece then we cant capture, but we can move
             // Needs to be different from the player who is playing
             // TargetSquare needs to be null, this means that the square is valid and is "empty" (no piece)

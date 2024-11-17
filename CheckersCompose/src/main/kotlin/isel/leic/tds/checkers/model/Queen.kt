@@ -13,7 +13,7 @@ class Queen(player: Player) : Piece(player) {
         get() = "Q"
 
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
-        val direction = directionOfMove(from, to)
+        val direction = directionOfMove(from, to, moves)
 
         tailrec fun findPathToSquare(currentSquare: Square?): Boolean =
             when {
@@ -22,68 +22,86 @@ class Queen(player: Player) : Piece(player) {
                 moves[currentSquare] != null -> false
                 else -> findPathToSquare(currentSquare.move(direction))
             }
+        // Check if the to Square has a piece
+        if(moves[to] != null) return false
 
         return findPathToSquare(from.move(direction))
     }
 
     // gets all the possible captures of a piece
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
-        // canCapture for every direction
-        // but does it check for every square
-        // from my position, do canCapture to from.move(direction) until it reaches the end of the board for every direction
         val fromPiece = moves[from] ?: return emptyMap()
 
-        // Helper function for recursive traversal in a direction
+        // Fun to verify captures in a specific direction
         tailrec fun findCaptures(
-            currentSquare: Square?,
+            startSquare: Square,
             direction: Direction,
-            captured: List<Square> = emptyList()
-        ): List<Square> {
-            // Base case: stop if the current square is null (board boundary) or if conditions aren't met
-            if (currentSquare == null) return captured
+            encounteredPieces: Int = 0
+        ): Map<Square, Piece> {
+            val nextSquare = startSquare.move(direction) ?: return emptyMap()
 
-            val nextSquare = currentSquare.move(direction)
-            return if (moves[currentSquare] == null || (nextSquare != null && canCapture(from, nextSquare, moves))) {
-                val newCaptured = if (nextSquare != null && canCapture(from, nextSquare, moves)) {
-                    captured + nextSquare
-                } else {
-                    captured
+            return when (val pieceAtNextSquare = moves[nextSquare]) {
+                null -> { //if nextSquare its empty
+                    if (encounteredPieces == 1) {
+                        // if an enemy piece was found before
+                        mapOf(nextSquare to fromPiece)
+                    } else {
+                        //No piece was found so keep searching
+                        findCaptures(nextSquare, direction, encounteredPieces)
+                    }
                 }
-                findCaptures(nextSquare, direction, newCaptured)
-            } else {
-                captured
+                else -> {
+                    //if there's a piece nextSquare
+                    if (pieceAtNextSquare.player != fromPiece.player && encounteredPieces == 0) {
+                        // first enemy piece found
+                        findCaptures(nextSquare, direction, encounteredPieces + 1)
+                    } else {
+                        // More than one enemy piece found or a piece that's mine
+                        emptyMap()
+                    }
+                }
             }
         }
-
-        // Accumulate captures for all directions
-        return directions.flatMap { direction ->
-            findCaptures(from.move(direction), direction)
+        // Search for every direction to get the possible captures
+        return directions.fold(emptyMap()) { acc, direction ->
+            acc + findCaptures(from, direction)
         }
-            .sortedBy { it.index }
-            .associateWith { fromPiece }
     }
 
+
+
+
     override fun canCapture(from: Square, to: Square, moves: Moves): Boolean {
-        // get the piece that is moving, if its empty return false
         val fromPiece = moves[from] ?: return false
+        val direction = directionOfMove(from, to, moves)
 
-        // see if the target square is empty, if it's not null return false
-        moves[to]?.let { return false }
+        if (direction == Direction.UNKNOWN) return false
 
-        // get the reverse direction to move to the previous square
-        val reverseDirection = directionOfMove(to, from)
+        // Fun to validate each capture in a direction
+        tailrec fun validateCapture(
+            currentSquare: Square?,
+            encounteredPieces: Int = 0
+        ): Boolean {
+            if (currentSquare == null) return false
+            if (currentSquare == to) {
+                // To needs to be empty and can only found one enemy piece
+                return encounteredPieces == 1 && moves[currentSquare] == null
+            }
 
-        // see if the square before targetSquare has an opposing piece, if its empty return false
-        val capturedSquare = to.move(reverseDirection) ?: return false
-
-        val capturedPiece = moves[capturedSquare] ?: return false
-
-        // check if it's a piece from the same player, if it is, return false
-        if(capturedPiece.player == fromPiece.player) return false
-
-        val squareBeforeCaptured = capturedSquare.move(reverseDirection) ?: return false
-
-        // see if the piece can move until the capturedPiece square, if it can, the capture is successful
-        return (squareBeforeCaptured == from || canMove (from, squareBeforeCaptured, moves))
+            return when (val pieceAtCurrentSquare = moves[currentSquare]) {
+                // if the square its empty, keep searching in the same direction and verify each square
+                null -> validateCapture(currentSquare.move(direction), encounteredPieces)
+                else -> {
+                    if (pieceAtCurrentSquare.player != fromPiece.player && encounteredPieces == 0) {
+                        // First enemy piece found
+                        validateCapture(currentSquare.move(direction), encounteredPieces + 1)
+                    } else {
+                        false // More than one enemy piece found or a piece that's mine
+                    }
+                }
+            }
+        }
+        // Start validating each square after from and in the movement direction
+        return validateCapture(from.move(direction))
     }
 }

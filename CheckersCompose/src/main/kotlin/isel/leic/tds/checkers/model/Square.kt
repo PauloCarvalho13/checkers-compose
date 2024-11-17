@@ -35,20 +35,51 @@ fun Square.move(direction: Direction): Square? {
     }
 }
 
-fun Square.getMiddleSquare(to: Square): Square? {
-    val rowDiff = (this.row.index - to.row.index).absoluteValue
-    val colDiff = (this.column.index - to.column.index).absoluteValue
+fun Square.getMiddleSquare(to: Square, moves: Moves): Square? {
+    // Calculate differences
+    val rowDiff = to.row.index - this.row.index
+    val colDiff = to.column.index - this.column.index
 
-    // Se a diferença for de exatamente duas casas, encontramos o quadrado do meio
-    return if (rowDiff == 2 && colDiff == 2) {
-        Square(
-            Row((this.row.index + to.row.index) / 2),
-            Column((this.column.index + to.column.index) / 2)
-        )
-    } else {
-        null
+    val rowStep = when {
+        rowDiff < 0 -> -1  // Moving upwards
+        rowDiff > 0 -> 1   // Moving downwards
+        else -> 0
     }
+
+    val colStep = when {
+        colDiff < 0 -> -1  // Moving left
+        colDiff > 0 -> 1   // Moving right
+        else -> 0
+    }
+
+    // function to walk along the path
+    tailrec fun walk(currentSquare: Square): Square? {
+        // Calculate the next square in the direction of the movement
+        val nextRow = currentSquare.row.index + rowStep
+        val nextCol = currentSquare.column.index + colStep
+
+        val nextSquare = Square(Row(nextRow), Column(nextCol))
+
+        // If we have reached the destination square, return null
+        if (nextRow == to.row.index && nextCol == to.column.index) {
+            return null
+        }
+
+        val pieceAtMiddle = moves[nextSquare]
+        if (pieceAtMiddle != null) {
+            return nextSquare  // Return the square if a piece is found
+        }
+
+        // Continue until a piece is found, or we reach the destination square
+        return walk(nextSquare)
+    }
+
+    return walk(this)
 }
+
+
+
+
 
 fun Square(row: Row, column: Column): Square
         = values[row.index * BOARD_DIM + column.index % BOARD_DIM]

@@ -71,37 +71,6 @@ class Queen(player: Player) : Piece(player) {
 
 
 
-    override fun canCapture(from: Square, to: Square, moves: Moves): Boolean {
-        val fromPiece = moves[from] ?: return false
-        val direction = directionOfMove(from, to, moves)
-
-        if (direction == Direction.UNKNOWN) return false
-
-        // Fun to validate each capture in a direction
-        tailrec fun validateCapture(
-            currentSquare: Square?,
-            encounteredPieces: Int = 0
-        ): Boolean {
-            if (currentSquare == null) return false
-            if (currentSquare == to) {
-                // To needs to be empty and can only found one enemy piece
-                return encounteredPieces == 1 && moves[currentSquare] == null
-            }
-
-            return when (val pieceAtCurrentSquare = moves[currentSquare]) {
-                // if the square its empty, keep searching in the same direction and verify each square
-                null -> validateCapture(currentSquare.move(direction), encounteredPieces)
-                else -> {
-                    if (pieceAtCurrentSquare.player != fromPiece.player && encounteredPieces == 0) {
-                        // First enemy piece found
-                        validateCapture(currentSquare.move(direction), encounteredPieces + 1)
-                    } else {
-                        false // More than one enemy piece found or a piece that's mine
-                    }
-                }
-            }
-        }
-        // Start validating each square after from and in the movement direction
-        return validateCapture(from.move(direction))
-    }
+    override fun canCapture(from: Square, to: Square, moves: Moves): Boolean =
+        moves[from]?.let { to in it.getPossibleCaptures(from, moves) } ?: false
 }

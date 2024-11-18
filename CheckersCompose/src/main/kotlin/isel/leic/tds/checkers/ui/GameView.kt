@@ -33,20 +33,32 @@ fun GameView(board: Board, selectedMove: Pair<Square, Piece>?, onClickSquare: (S
             ) {
                 repeat(BOARD_DIM) { col ->
                     val square = Square(Row(row), Column(col))
+                    val moves = board.moves
                     SquareView(
                         // não está a fazer a jogada apropriadamente
-                        piece = board.moves[square],
+                        piece = moves[square],
                         onClick= { onClickSquare(square) },
                         modifier = Modifier.size(CELL_SIZE).background(
                             when {
                                 !square.black -> lightBrown
-                                selectedMove == null -> darkBrown
-                                selectedMove.second.canCapture(selectedMove.first, square, board.moves) -> lightYellow
-                                selectedMove.second.canMove(selectedMove.first, square, board.moves) -> lightBlue
-                                selectedMove.first == square &&
-                                        board is BoardRun &&
-                                        board.turn == selectedMove.second.player
-                                             -> lightRed
+                                // check if it's a running game, if it is, continue verifications, if it's not darkBrown
+                                board is BoardRun ->{
+                                    when{
+                                        // check if there's a selectedMove, if not darkBrown
+                                        selectedMove == null -> darkBrown
+                                        // if it's not a piece of the turn player, darkBrown
+                                        moves[square]?.let { it.player != board.turn } == true -> darkBrown
+                                        // check if it's a move
+                                        selectedMove.second.getPossibleCaptures(selectedMove.first, moves).isEmpty() &&
+                                                selectedMove.second.canMove(selectedMove.first, square, moves)
+                                            -> lightBlue
+                                        // see of it's the selectedSquare
+                                        selectedMove.first == square -> lightRed
+                                        // check if it's a capture
+                                        selectedMove.second.canCapture(selectedMove.first, square, moves) -> lightYellow
+                                        else -> darkBrown
+                                    }
+                                }
                                 else -> darkBrown
                             }
                     ))

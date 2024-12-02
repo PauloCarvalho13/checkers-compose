@@ -7,18 +7,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.window.Window
-import androidx.compose.ui.window.WindowState
-import androidx.compose.ui.window.application
+import androidx.compose.ui.window.*
 import isel.leic.tds.checkers.model.*
-import isel.leic.tds.checkers.ui.GameView
-import isel.leic.tds.checkers.ui.StatusBarView
+import isel.leic.tds.checkers.ui.*
 
 const val BOARD_DIM = 8
 
 @Composable
 @Preview
-private fun BoardApp() {
+private fun FrameWindowScope.BoardApp(vm: AppViewModel) {
     var game: Game by remember { mutableStateOf(Game().new()) }
     var selectedMove: Pair<Square, Piece>? by remember { mutableStateOf(null) }
     MaterialTheme {
@@ -44,15 +41,38 @@ private fun BoardApp() {
                 })
                 StatusBarView(game)
             }
+            if(vm.scoreView) ScoreDialog(vm.score, onClose = vm::hideScore)
+            vm.action?.let { NameEdit(it, vm::cancelAction, vm::doAction) }
+            vm.message?.let { Message(it, vm::cancelMessage) }
+        }
+    }
+}
+
+@Composable
+fun FrameWindowScope.BoardMenu(vm: AppViewModel, onExit: ()->Unit){
+    MenuBar {
+        Menu("Game"){
+            Item("New board", enabled = vm.hasClash, onClick = vm::newBoard)
+            Item("Score",  enabled = vm.hasClash, onClick = vm::showScore)
+            Item("Exit", onClick = onExit )
+            Item("Refresh",  enabled = vm.hasClash, onClick = vm::refresh)
+        }
+        Menu("Clash") {
+            Item("Start", onClick = vm::start)
+            Item("Join", onClick = vm::join)
         }
     }
 }
 
 fun main() = application {
+    val vm = remember { AppViewModel() } //ViewModel
+    val onExit = { vm.exit(); exitApplication() }
     Window(
-        onCloseRequest = ::exitApplication,
-        state = WindowState(size = DpSize.Unspecified)
+        onCloseRequest = onExit,
+        state = WindowState(size = DpSize.Unspecified),
+        title = "Checkers"
     ) {
-        BoardApp()
+        BoardMenu(vm, onExit)
+        BoardApp(vm)
     }
 }

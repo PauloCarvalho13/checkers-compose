@@ -23,6 +23,11 @@ class ClashRun(
     val id: Name,
 ) : Clash(st)
 
+private fun Clash.removeIfStarted() {
+    if (this is ClashRun && sidePlayer==Player.WHITE)
+        st.delete(this.id)
+}
+
 fun Clash.start(id : Name): Clash {
     val gameCreated = st.read(id)
     if(gameCreated != null){
@@ -34,9 +39,13 @@ fun Clash.start(id : Name): Clash {
     }
 }
 
-private fun Clash.join(id: Name): Clash{
+fun Clash.join(id: Name): Clash{
     val game = requireNotNull(st.read(id))
     return ClashRun(st, game, game.firstPlayer, id)
+}
+
+fun Clash.exit() {
+    removeIfStarted()
 }
 
 private fun Clash.runOper( oper: ClashRun.()->Game ): Clash {
@@ -47,6 +56,10 @@ private fun Clash.runOper( oper: ClashRun.()->Game ): Clash {
 
 fun Clash.refresh() = runOper {
     (st.read(id) as Game).also { check(game!=it) { "No modification" } }
+}
+
+fun Clash.newBoard() = runOper {
+    game.new().also { st.update(id,it) }
 }
 
 fun Clash.play(initpos: Square, finalpos: Square) = runOper {

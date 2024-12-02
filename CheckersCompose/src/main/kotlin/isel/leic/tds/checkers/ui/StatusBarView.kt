@@ -2,10 +2,7 @@ package isel.leic.tds.checkers.ui
 
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -22,13 +19,18 @@ fun StatusBarView(game: Game) {
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
+        game.firstPlayer.let {
+            Text("You: ", fontSize = 32.sp)
+            SquareView(Pawn(it),modifier = Modifier.size(32.dp))
+            Spacer(Modifier.width(32.dp))
+        }
         val (state,player) = when(game.board) {
             is BoardRun -> "Turn: " to game.board.turn
             is BoardWin -> "Winner: " to game.board.winner
-            else -> "" to Player.WHITE // todo idk what to put
+            null -> "No board" to null
         }
         Text(state, fontSize = 32.sp)
-        SquareView(Pawn(player), modifier = Modifier.size(32.dp))
+        player?.let { SquareView(Pawn(player), modifier = Modifier.size(32.dp)) }
     }
 }
 

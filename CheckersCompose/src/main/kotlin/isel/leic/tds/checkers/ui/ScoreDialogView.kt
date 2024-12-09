@@ -15,7 +15,7 @@ import isel.leic.tds.checkers.model.Score
 
 @Composable
 fun ScoreDialog(
-    score: Score,
+    score: Score?,
     onClose: ()->Unit,
 ) = AlertDialog(
     onDismissRequest = onClose,
@@ -27,7 +27,7 @@ fun ScoreDialog(
 )
 
 @Composable
-private fun ScoreContent(score: Score) {
+private fun ScoreContent(score: Score?) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceBetween
@@ -36,11 +36,11 @@ private fun ScoreContent(score: Score) {
             Player.entries.forEach {
                 Row {
                     Player(it, modifier = Modifier.size(32.dp))
-                    Text(" - ${score[it]}", style = MaterialTheme.typography.h4)
+                    Text(" - ${score?.get(it) ?: "0"}", style = MaterialTheme.typography.h4)
                 }
             }
         }
-        Text("Draws - ${score[null]}", style = MaterialTheme.typography.h5)
+        Text("Draws - ${score?.get(null) ?: "0"}", style = MaterialTheme.typography.h5)
     }
 }
 

@@ -21,7 +21,7 @@ private val lightYellow = Color(255, 222, 33)
 private val lightBlue = Color(173, 216, 255)
 
 @Composable
-fun GameView(board: Board, selectedMove: Pair<Square, Piece>?, onClickSquare: (Square) -> Unit) {
+fun GameView(board: Board?, selectedMove: Pair<Square, Piece>?, sidePlayer: Player?,onClickSquare: (Square) -> Unit) {
     Column(
         modifier = Modifier.size(GRID_WIDTH).background(Color.Black),
         verticalArrangement = Arrangement.SpaceBetween
@@ -33,7 +33,8 @@ fun GameView(board: Board, selectedMove: Pair<Square, Piece>?, onClickSquare: (S
             ) {
                 repeat(BOARD_DIM) { col ->
                     val square = Square(Row(row), Column(col))
-                    val moves = board.moves
+                    val moves = board?.moves ?: emptyMap()
+
                     SquareView(
                         // não está a fazer a jogada apropriadamente
                         piece = moves[square],
@@ -75,5 +76,5 @@ fun GamePreview() {
         .play("3e".toSquare(), "4f".toSquare())
         .play("6f".toSquare(), "5g".toSquare())
 
-    GameView(game.board!!, null, { })
+    //GameView(game.board!!, null, { })
 }

@@ -13,24 +13,32 @@ import androidx.compose.ui.unit.sp
 import isel.leic.tds.checkers.model.*
 
 @Composable
-fun StatusBarView(game: Game) {
+fun StatusBarView(game: Game?) {
     Row(
         modifier = Modifier.width(GRID_WIDTH).background(Color.DarkGray),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.Center
     ) {
-        game.firstPlayer.let {
-            Text("You: ", fontSize = 32.sp)
-            SquareView(Pawn(it),modifier = Modifier.size(32.dp))
-            Spacer(Modifier.width(32.dp))
+        if(game == null){
+            Box(
+                modifier = Modifier.width(GRID_WIDTH),
+            ){
+                Text("Start a new game", fontSize = 18.sp)
+            }
+        } else {
+            game.firstPlayer.let {
+                Text("You: ", fontSize = 32.sp)
+                SquareView(Pawn(it), modifier = Modifier.size(32.dp))
+                Spacer(Modifier.width(32.dp))
+            }
+            val (state, player) = when (game.board) {
+                is BoardRun -> "Turn: " to game.board.turn
+                is BoardWin -> "Winner: " to game.board.winner
+                null -> "No board" to null
+            }
+            Text(state, fontSize = 32.sp)
+            player?.let { SquareView(Pawn(player), modifier = Modifier.size(32.dp)) }
         }
-        val (state,player) = when(game.board) {
-            is BoardRun -> "Turn: " to game.board.turn
-            is BoardWin -> "Winner: " to game.board.winner
-            null -> "No board" to null
-        }
-        Text(state, fontSize = 32.sp)
-        player?.let { SquareView(Pawn(player), modifier = Modifier.size(32.dp)) }
     }
 }
 

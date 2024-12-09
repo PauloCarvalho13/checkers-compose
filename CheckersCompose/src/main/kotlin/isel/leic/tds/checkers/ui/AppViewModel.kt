@@ -17,12 +17,35 @@ class AppViewModel {
 
     private var clash: Clash by mutableStateOf(Clash(storage))
     val hasClash:Boolean get() = clash is ClashRun
-    val board: Board? get() = (clash as? ClashRun)?.game?.board
-    val score get() = (clash as ClashRun).game.score
-    val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
+    val game: Game? get() = (clash as? ClashRun)?.game
+    val board: Board? get() = game?.board
 
+    var selectedMove: Pair<Square, Piece>? by mutableStateOf(null)
+
+    val score get() = game?.score
+    fun play(square: Square) {
+        if (board is BoardRun) {
+            try {
+                board as BoardRun
+                val move = (board as BoardRun).moves[square]
+                // see if the square clicked has a piece
+                if (move != null && move.player == (board as BoardRun).turn) { // if not change selectedMove
+                    selectedMove = Pair(square, move)
+                } else { // square selected doesn't have a piece
+                    if (selectedMove != null) { // if not play, else ignore
+                        exec { play(selectedMove!!.first, square) }
+                        selectedMove = null // reset selectedMove
+                    }
+                }
+
+            } catch (ex: Exception) {
+                println(ex.message)
+            }
+        }
+    }
+
+    val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
     fun exit() { clash.exit() }
-    fun play(initPos: Square, endPos: Square) = exec{play(initPos,endPos)}
     fun newBoard() = exec(Clash::newBoard)
 
     // UI State

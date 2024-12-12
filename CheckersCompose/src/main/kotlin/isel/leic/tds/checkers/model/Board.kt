@@ -13,6 +13,7 @@ sealed class Board(val moves: Moves) {
 class BoardRun(val turn: Player, squares: Moves = emptyMap()): Board(squares)
 class BoardWin( val winner: Player, squares: Moves): Board(squares)
 
+class InvalidMoveException(): IllegalArgumentException()
 
 private val piecesPerPlayer = mapOf(8 to 12, 6 to 6,  4 to 2)
 
@@ -46,12 +47,10 @@ fun Board.isValidMove(from: Square, to: Square): Boolean{
 
 fun Board.play(from: Square, to: Square): Board {
     check(this is BoardRun){ "Game Over" }
-    // this is now treated as a BoardRun
 
-    if(!isValidMove(from, to)){
-        println("Invalid move")
-        return this
-    }
+   if(!isValidMove(from, to)){
+       throw InvalidMoveException()
+   }
 
     val boardAfter = this.makePlay(from , to)
     val winner = boardAfter.winner()

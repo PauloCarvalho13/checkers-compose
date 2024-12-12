@@ -39,7 +39,7 @@ fun FrameWindowScope.BoardMenu(vm: AppViewModel, onExit: ()->Unit){
             Item("New board", enabled = vm.isSideTurn, onClick = vm::newBoard)
             Item("Score",  enabled = vm.hasClash, onClick = vm::showScore)
             Item("Exit", onClick = onExit )
-            Item("Refresh",  enabled = vm.hasClash, onClick = vm::refresh)
+            Item("Refresh",  enabled = vm.hasClash && !vm.autoRefresh, onClick = vm::refresh)
         }
         Menu("Clash") {
             Item("Start", onClick = vm::start)

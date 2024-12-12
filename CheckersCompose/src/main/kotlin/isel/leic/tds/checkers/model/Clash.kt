@@ -58,8 +58,10 @@ class NoModificationException(name: Name): IllegalStateException("No modificatio
 class GameDeletedException(name: Name): IllegalStateException("Game $name deleted")
 
 fun Clash.refresh() = runOper {
-    (st.read(id) as Game).also { check(game!=it) { "No modification" } }
+    (st.read(id) ?: throw GameDeletedException(id))
+        .also { if (game == it) throw NoModificationException(id) }
 }
+
 
 fun Clash.newBoard() = runOper {
     game.new().also { st.update(id,it) }

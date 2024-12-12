@@ -30,56 +30,51 @@ fun SquareView(
     Box(
         modifier = modifier
             .clickable(onClick = onClick)
-            .then(
-                if (isSelected) {
-                    Modifier.border(3.dp, Color.Red)
-                } else {
-                    Modifier
-                }
-            )
+            .then(if (isSelected) Modifier.border(3.dp, Color.Red) else Modifier)
     ) {
-        if (piece != null) {
-            val file = when (piece) {
-                is Pawn -> when (piece.player) {
-                    Player.WHITE -> "pawn_white"
-                    Player.BLACK -> "pawn_black"
-                }
-
-                is Queen -> when (piece.player) {
-                    Player.WHITE -> "queen_white"
-                    Player.BLACK -> "queen_black"
-                }
-
-                else -> ""
-            }
-            Image(
-                painter = painterResource("$file.png"),
-                contentDescription = "Player $file",
-                modifier = Modifier.fillMaxSize() // Garante que a imagem se ajuste ao tamanho do quadrado
-            )
-        }else if(showTargets){
-            when {
-                isPossibleMove -> {
-                    Box(
-                        modifier = Modifier
-                            .size(CIRCLE_SIZE)
-                            .align(Alignment.Center)
-                            .background(Color.Green, shape = CircleShape)
-                    )
-                }
-                isPossibleCapture -> {
-                    Box(
-                        modifier = Modifier
-                            .size(CIRCLE_SIZE)
-                            .align(Alignment.Center)
-                            .background(Color.Yellow, shape = CircleShape)
-                    )
-                }
-            }
+        when {
+            piece != null -> RenderPiece(piece)
+            showTargets -> RenderTarget(isPossibleMove, isPossibleCapture)
         }
     }
 }
 
+@Composable
+private fun RenderPiece(piece: Piece) {
+    val file = when (piece) {
+        is Pawn -> if (piece.player == Player.WHITE) "pawn_white" else "pawn_black"
+        is Queen -> if (piece.player == Player.WHITE) "queen_white" else "queen_black"
+        else -> null
+    }
+
+    file?.let {
+        Image(
+            painter = painterResource("$it.png"),
+            contentDescription = "Player $it",
+            modifier = Modifier.fillMaxSize()
+        )
+    }
+}
+
+@Composable
+private fun RenderTarget(isPossibleMove: Boolean, isPossibleCapture: Boolean) {
+    val (color, size) = when {
+        isPossibleMove -> Color.Green to CIRCLE_SIZE
+        isPossibleCapture -> Color.Yellow to CIRCLE_SIZE
+        else -> return
+    }
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Box(
+            modifier = Modifier
+                .size(size)
+                .align(Alignment.Center)
+                .background(color, shape = CircleShape)
+        )
+    }
+}
 @Composable
 @Preview
 fun SquarePreview() {

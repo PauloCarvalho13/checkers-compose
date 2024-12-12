@@ -23,39 +23,42 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     //val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
 
     var clash: Clash by mutableStateOf(Clash(storage))
-
     val hasClash:Boolean get() = clash is ClashRun
+
     val game: Game? get() = (clash as? ClashRun)?.game
     val board: Board? get() = game?.board
+
     var selectedMove: Pair<Square, Piece>? by mutableStateOf(null)
+
     val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
     val isSideTurn get() = clash.isSideTurn
 
     val score get() = game?.score
 
     fun selectSquare(square: Square) {
-        if (!hasClash || board !is BoardRun || !clash.isSideTurn) return
+        if (isWaiting || !hasClash || board !is BoardRun || !clash.isSideTurn) return
 
-        if (square.black) {
-            val previousMove = selectedMove
-            val pieceOnSquare = (board as BoardRun).moves[square]
+        if (!square.black) return
 
-            when {
-                previousMove != null && pieceOnSquare == null -> {
-                    exec { play(previousMove.first, square) }
-                    selectedMove = null
-                    if(autoRefresh) waitingForOther()
-                }
-                previousMove != null && pieceOnSquare != null ->{
-                    if(pieceOnSquare.player == sidePlayer) selectedMove = Pair(square, pieceOnSquare)
-                }
-                previousMove == null && pieceOnSquare != null -> {
-                    if (pieceOnSquare.player == sidePlayer) selectedMove = Pair(square, pieceOnSquare)
-                }
-                else -> { /* Keep current state */ }
+        val boardRun = board as BoardRun
+        val pieceOnSquare: Piece? = boardRun.moves[square]
+        val previousMove: Pair<Square, Piece>? = selectedMove
+
+        when {
+
+            previousMove != null && pieceOnSquare == null -> {
+                exec { play(previousMove.first, square) }
+
+                if (autoRefresh) waitingForOther()
             }
+
+            pieceOnSquare != null && pieceOnSquare.player == sidePlayer -> {
+                selectedMove = Pair(square, pieceOnSquare)
+            }
+
         }
     }
+
 
     fun exit() {
         if (autoRefresh) cancelWaiting()
@@ -86,8 +89,11 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
         private set
 
     fun refresh() = exec( Clash::refresh )
+
     fun start() { action = Action.START }
+
     fun join() { action = Action.JOIN }
+
     fun cancelAction() { action = null }
 
     fun doAction(name: Name) {
@@ -101,19 +107,24 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
         if (autoRefresh) waitingForOther()
         action = null
     }
+
     var message: String? by mutableStateOf(null)
         private set
 
     fun cancelMessage() { message = null }
 
     private fun exec( fx: Clash.()->Clash ) {
-        try { clash = clash.fx() }
+        try {
+            clash = clash.fx()
+            selectedMove = null
+        }
         catch(ex: Exception) {
             manageException(ex)
         }
     }
 
     private fun manageException(ex: Exception) {
+        if (ex is InvalidMoveException) return
         if (ex is IllegalArgumentException || ex is IllegalStateException){
             message = ex.message
             if (ex is GameDeletedException)
@@ -123,6 +134,8 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     }
 
     private var waitingJob by mutableStateOf<Job?>(null)
+
+    private val isWaiting get() = waitingJob != null
 
     private fun cancelWaiting(){
         waitingJob?.cancel()

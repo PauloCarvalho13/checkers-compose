@@ -4,77 +4,102 @@ import BOARD_DIM
 import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import isel.leic.tds.checkers.model.*
 
 private val CELL_SIZE = 50.dp
 private val LINE_WIDTH = 2.dp
+val MARGIN_WIDTH = 12.dp
 val GRID_WIDTH = CELL_SIZE * BOARD_DIM + LINE_WIDTH * (BOARD_DIM-1)
+val BOARD_WITH  = GRID_WIDTH + (2 * MARGIN_WIDTH)
 
-private val lightBrown = Color(196, 164, 132)
+
 private val darkBrown = Color(139, 69, 19)
-private val lightRed = Color(255, 100, 100)
-private val lightYellow = Color(255, 222, 33)
-private val lightBlue = Color(173, 216, 255)
 
 @Composable
-fun GameView(board: Board?, selectedMove: Pair<Square, Piece>?, sidePlayer: Player?,onClickSquare: (Square) -> Unit) {
-    Column(
-        modifier = Modifier.size(GRID_WIDTH).background(Color.Black),
-        verticalArrangement = Arrangement.SpaceBetween
-    ) {
-        repeat(BOARD_DIM) { row ->
+fun GameView(
+    board: Board?,
+    showTargets: Boolean,
+    selectedMove: Pair<Square, Piece>?,
+    sidePlayer: Player = Player.WHITE,
+    onClickSquare: (Square) -> Unit
+) {
+    Column(modifier = Modifier.size(BOARD_WITH + MARGIN_WIDTH).background(darkBrown)) {
+        Column(
+            modifier = Modifier.size(BOARD_WITH),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Spacer(modifier = Modifier.size(MARGIN_WIDTH / 4))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.Center
             ) {
+                Spacer(modifier = Modifier.width(MARGIN_WIDTH + CELL_SIZE / 2))
                 repeat(BOARD_DIM) { col ->
-                    val square = Square(Row(row), Column(col))
-                    val moves = board?.moves ?: emptyMap()
+                    Text(
+                        text = "${Column(col).symbol}",
+                        modifier = Modifier.width(CELL_SIZE)
+                    )
+                }
+            }
 
-                    SquareView(
-                        // não está a fazer a jogada apropriadamente
-                        piece = moves[square],
-                        onClick= { onClickSquare(square) },
-                        modifier = Modifier.size(CELL_SIZE).background(
-                            when {
-                                !square.black -> lightBrown
-                                // check if it's a running game, if it is, continue verifications, if it's not darkBrown
-                                board is BoardRun ->{
-                                    when{
-                                        // check if there's a selectedMove, if not darkBrown
-                                        selectedMove == null -> darkBrown
-                                        // if it's not a piece of the turn player, darkBrown
-                                        moves[square]?.let { it.player != board.turn } == true -> darkBrown
-                                        // check if it's a move
-                                        selectedMove.second.getPossibleCaptures(selectedMove.first, moves).isEmpty() &&
-                                                selectedMove.second.canMove(selectedMove.first, square, moves)
-                                            -> lightBlue
-                                        // see of it's the selectedSquare
-                                        selectedMove.first == square -> lightRed
-                                        // check if it's a capture
-                                        selectedMove.second.canCapture(selectedMove.first, square, moves) -> lightYellow
-                                        else -> darkBrown
-                                    }
-                                }
-                                else -> darkBrown
-                            }
-                    ))
+            Spacer(modifier = Modifier.size(MARGIN_WIDTH / 4))
+
+            repeat(BOARD_DIM) { index ->
+                val row = if (sidePlayer == Player.WHITE) index else BOARD_DIM - 1 - index
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Spacer(modifier = Modifier.size(0.75 * MARGIN_WIDTH))
+                    Text("${Row(row).digit}")
+                    Spacer(modifier = Modifier.size(MARGIN_WIDTH / 2))
+
+                    repeat(BOARD_DIM) { col ->
+                        val square = Square(Row(row), Column(col))
+                        val moves = board?.moves
+
+                        val squareColor = if(square.black) Color.DarkGray else Color.Gray
+
+                        val isSelected = selectedMove?.first == square
+                        val isPossibleMove = selectedMove != null &&
+                                board is BoardRun &&
+                                selectedMove.second.getPossibleCaptures(selectedMove.first, moves ?: emptyMap()).isEmpty() &&
+                                selectedMove.second.canMove(selectedMove.first, square, moves ?: emptyMap())
+
+                        val isPossibleCapture = selectedMove != null &&
+                                board is BoardRun &&
+                                selectedMove.second.canCapture(selectedMove.first, square, moves ?: emptyMap())
+
+                        SquareView(
+                            piece = moves?.get(square),
+                            showTargets = showTargets,
+                            isSelected = isSelected,
+                            isPossibleMove = isPossibleMove,
+                            isPossibleCapture = isPossibleCapture,
+                            onClick = { onClickSquare(square) },
+                            modifier = Modifier.size(CELL_SIZE).background(squareColor)
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+
+
 @Composable
 @Preview
 fun GamePreview() {
     val game = Game().new()
-        .play("3e".toSquare(), "4f".toSquare())
-        .play("6f".toSquare(), "5g".toSquare())
 
-    //GameView(game.board!!, null, { })
+    GameView(game.board!!,true,null, Player.WHITE) { }
 }

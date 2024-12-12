@@ -1,6 +1,5 @@
 package isel.leic.tds.checkers.ui
 
-import androidx.compose.desktop.ui.tooling.preview.Preview
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
@@ -13,38 +12,37 @@ import androidx.compose.ui.unit.sp
 import isel.leic.tds.checkers.model.*
 
 @Composable
-fun StatusBarView(game: Game?) {
+fun StatusBarView(clash: Clash) {
     Row(
-        modifier = Modifier.width(GRID_WIDTH).background(Color.DarkGray),
+        modifier = Modifier
+            .width(BOARD_WITH + MARGIN_WIDTH)
+            .background(Color.DarkGray),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.Center
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        if(game == null){
-            Box(
-                modifier = Modifier.width(GRID_WIDTH),
-            ){
-                Text("Start a new game", fontSize = 18.sp)
+        when (clash) {
+            is ClashRun -> {
+                Text("Game: ${clash.id}")
+                Spacer(Modifier.width(22.dp))
+                clash.sidePlayer.let { sidePlayer ->
+                    Text("You: ${sidePlayer.name}", fontSize = 18.sp)
+                    Spacer(Modifier.width(18.dp))
+
+                    val message = when (clash.game.board) {
+                        is BoardRun -> if (clash.game.board.turn == sidePlayer) "Your turn" else "Waiting.."
+                        is BoardWin -> if (clash.game.board.winner == sidePlayer) "You WIN" else "You LOSE"
+                        else -> ""
+                    }
+
+                    Spacer(Modifier.size(18.dp))
+                    Text(message, fontSize = 18.sp)
+                }
             }
-        } else {
-            game.firstPlayer.let {
-                Text("You: ", fontSize = 32.sp)
-                SquareView(Pawn(it), modifier = Modifier.size(32.dp))
-                Spacer(Modifier.width(32.dp))
+            else -> {
+                Box(modifier = Modifier.width(BOARD_WITH + MARGIN_WIDTH)) {
+                    Text("Start a new game", fontSize = 18.sp)
+                }
             }
-            val (state, player) = when (game.board) {
-                is BoardRun -> "Turn: " to game.board.turn
-                is BoardWin -> "Winner: " to game.board.winner
-                null -> "No board" to null
-            }
-            Text(state, fontSize = 32.sp)
-            player?.let { SquareView(Pawn(player), modifier = Modifier.size(32.dp)) }
         }
     }
-}
-
-@Composable
-@Preview
-fun StatusBarPreview() {
-    val game = Game().new()
-    StatusBarView(game)
 }

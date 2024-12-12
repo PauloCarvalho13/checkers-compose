@@ -11,7 +11,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
-private const val REFRESH_DELAY_TIME = 5000L
+private const val REFRESH_DELAY_TIME = 1000L
 
 enum class Action(val text: String) {
     START("Start"),

@@ -31,9 +31,10 @@ class Pawn(player: Player): Piece(player) {
                 // Check if the middle square contains an opponent's piece and the target square is empty
                 if (middleSquarePiece != null &&
                     middleSquarePiece.player != player &&
-                    targetSquarePiece == null
+                    targetSquarePiece == null &&
+                    moves[from] != null
                 ) {
-                    targetSquare to moves[from]!! // moves[from] was checked to not be null before
+                    targetSquare to moves[from]!!
                 } else {
                     null
                 }

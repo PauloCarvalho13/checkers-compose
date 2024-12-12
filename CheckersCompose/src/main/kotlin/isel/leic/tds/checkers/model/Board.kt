@@ -40,9 +40,9 @@ fun Board.isValidMove(from: Square, to: Square): Boolean{
     check(this is BoardRun){"Game not started"}
     val piece = moves[from]?: return false
     return piece.player == turn  &&
-            ( piece.canCapture(from, to, moves) || piece.canMove(from, to, moves))
+            ( piece.canCapture(from, to, moves) ||
+                    (piece.canMove(from, to, moves) && moves.getAllCaptures(piece.player).isEmpty()) )
 }
-
 
 fun Board.play(from: Square, to: Square): Board {
     check(this is BoardRun){ "Game Over" }

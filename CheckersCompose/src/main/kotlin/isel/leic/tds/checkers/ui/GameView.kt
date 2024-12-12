@@ -72,7 +72,8 @@ fun GameView(
                         val isPossibleMove = selectedMove != null &&
                                 board is BoardRun &&
                                 selectedMove.second.getPossibleCaptures(selectedMove.first, moves ?: emptyMap()).isEmpty() &&
-                                selectedMove.second.canMove(selectedMove.first, square, moves ?: emptyMap())
+                                selectedMove.second.canMove(selectedMove.first, square, moves ?: emptyMap()) &&
+                                (moves ?: emptyMap()).getAllCaptures(sidePlayer).isEmpty()
 
                         val isPossibleCapture = selectedMove != null &&
                                 board is BoardRun &&

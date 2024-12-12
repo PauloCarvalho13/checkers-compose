@@ -1,5 +1,7 @@
 package isel.leic.tds.checkers.ui
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedTextField
@@ -10,6 +12,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.text.input.ImeAction
 import isel.leic.tds.checkers.model.Name
 
 @Composable
@@ -32,7 +35,24 @@ fun NameEdit(
             TextButton(onClick = onCancel) { Text("Cancel") }
         },
         text = {
-            OutlinedTextField(txt, onValueChange = { txt = it }, label = { Text("Name")})
+            OutlinedTextField(
+                value = txt,
+                onValueChange = { newValue ->
+                    txt = newValue.filter { it != '\n' }
+                },
+                label = { Text("Name") },
+                keyboardOptions = KeyboardOptions.Default.copy(
+                    imeAction = ImeAction.Done
+                ),
+                keyboardActions = KeyboardActions(
+                    onDone = {
+                        if (Name.isValid(txt)) {
+                            onAction(Name(txt))
+                        }
+                    }
+                ),
+                singleLine = true
+            )
         }
     )
 }

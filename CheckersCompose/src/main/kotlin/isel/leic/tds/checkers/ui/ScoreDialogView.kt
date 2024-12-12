@@ -40,7 +40,6 @@ private fun ScoreContent(score: Score?) {
                 }
             }
         }
-        Text("Draws - ${score?.get(null) ?: "0"}", style = MaterialTheme.typography.h5)
     }
 }
 

@@ -19,8 +19,12 @@ val MARGIN_WIDTH = 12.dp
 val GRID_WIDTH = CELL_SIZE * BOARD_DIM + LINE_WIDTH * (BOARD_DIM-1)
 val BOARD_WITH  = GRID_WIDTH + (2 * MARGIN_WIDTH)
 
-
 private val darkBrown = Color(139, 69, 19)
+
+data class BoardTheme(
+    val squareColor: Color,
+    val columnColor: Color
+)
 
 @Composable
 fun GameView(
@@ -28,9 +32,11 @@ fun GameView(
     showTargets: Boolean,
     selectedMove: Pair<Square, Piece>?,
     sidePlayer: Player = Player.WHITE,
+    theme: Theme,
     onClickSquare: (Square) -> Unit
 ) {
-    Column(modifier = Modifier.size(BOARD_WITH + MARGIN_WIDTH).background(darkBrown)) {
+    val boardTheme = GameTheme(Square(Row(0), Column(0)), theme)
+    Column(modifier = Modifier.size(BOARD_WITH + MARGIN_WIDTH).background(boardTheme.columnColor)) {
         Column(
             modifier = Modifier.size(BOARD_WITH),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -66,7 +72,7 @@ fun GameView(
                         val square = Square(Row(row), Column(col))
                         val moves = board?.moves
 
-                        val squareColor = if(square.black) Color.DarkGray else Color.Gray
+                        val squareColor = GameTheme(square, theme).squareColor
 
                         val isSelected = selectedMove?.first == square
                         val isPossibleMove = selectedMove != null &&
@@ -95,6 +101,24 @@ fun GameView(
     }
 }
 
+@Composable
+fun GameTheme(square: Square, theme: Theme): BoardTheme {
+    return when (theme) {
+        Theme.DEFAULT -> BoardTheme(
+            squareColor = if (square.black) Color(0xFF4E342E) else Color(0xFFD7CCC8),
+            columnColor = Color(0xFF616161)
+        )
+        Theme.LIGHT -> BoardTheme(
+            squareColor = if (square.black) Color(0xFFB3E5FC) else Color(0xFFFFFFFF),
+            columnColor = Color(0xFF00ACC1)
+        )
+        Theme.COLORFUL -> BoardTheme(
+            squareColor = if (square.black) Color(0xFFF48FB1) else Color(0xFFFFF59D),
+            columnColor = Color(0xFF00ACC1)
+        )
+    }
+}
+
 
 
 @Composable
@@ -102,5 +126,5 @@ fun GameView(
 fun GamePreview() {
     val game = Game().new()
 
-    GameView(game.board!!,true,null, Player.WHITE) { }
+    GameView(game.board!!,true,null, Player.WHITE, Theme.LIGHT) { }
 }

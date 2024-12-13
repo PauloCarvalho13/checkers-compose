@@ -22,7 +22,8 @@ private fun FrameWindowScope.BoardApp(vm: AppViewModel) {
                 showTargets = vm.showTargets,
                 selectedMove = vm.selectedMove,
                 sidePlayer = vm.sidePlayer ?: Player.WHITE ,
-                onClickSquare = { square: Square -> vm.selectSquare(square) }
+                onClickSquare = { square: Square -> vm.selectSquare(square) },
+                theme = vm.selectedTheme
             )
             StatusBarView(vm.clash)
         }
@@ -55,6 +56,18 @@ fun FrameWindowScope.BoardMenu(vm: AppViewModel, onExit: ()->Unit){
                 text = "Auto Refresh",
                 checked = vm.autoRefresh,
                 onCheckedChange = vm::changeAutoRefresh
+            )
+        }
+        Menu("Theme"){
+            CheckboxItem(
+                text = "Light",
+                checked = vm.selectedTheme == Theme.LIGHT,
+                onCheckedChange =  { vm.changeTheme(Theme.LIGHT) }
+            )
+            CheckboxItem(
+                text = "Colorful",
+                checked = vm.selectedTheme == Theme.COLORFUL,
+                onCheckedChange = { vm.changeTheme(Theme.COLORFUL) }
             )
         }
     }

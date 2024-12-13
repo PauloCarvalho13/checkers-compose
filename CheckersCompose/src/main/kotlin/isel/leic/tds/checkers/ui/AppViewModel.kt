@@ -18,6 +18,10 @@ enum class Action(val text: String) {
     JOIN("Join")
 }
 
+enum class Theme {
+    DEFAULT, LIGHT, COLORFUL
+}
+
 class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     val storage = TextFileStorage<Name,Game>("games",GameSerializer)
     //val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
@@ -66,6 +70,14 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     }
 
     fun newBoard() = exec(Clash::newBoard)
+
+    // Ui Theme
+    var selectedTheme by mutableStateOf(Theme.DEFAULT)
+        private set
+
+    fun changeTheme(theme: Theme) {
+        selectedTheme = if (selectedTheme == theme) Theme.DEFAULT else theme
+    }
 
     // UI State
     var scoreView by mutableStateOf(false)

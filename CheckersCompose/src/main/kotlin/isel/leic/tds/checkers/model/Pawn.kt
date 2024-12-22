@@ -3,19 +3,15 @@ package isel.leic.tds.checkers.model
 class Pawn(player: Player): Piece(player) {
     override val type: String = "P"
 
-    // should check the from square is in moves
+    // should check the start square is in moves
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val direction = directionOfMove(from, to, moves)
-        // its already assured that the from position is valid, checked at Game.play()
+        // its already assured that the start position is valid, checked at Game.play()
         return direction != Direction.UNKNOWN && from.move(direction) == to && moves[to] == null
     }
 
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
-        val captureDirections = if(player == Player.WHITE){
-            listOf(Direction.DOWN_LEFT_CAP, Direction.DOWN_RIGHT_CAP)
-        }else{
-            listOf(Direction.UP_LEFT_CAP,Direction.UP_RIGHT_CAP)
-        }
+        val captureDirections = player.possibleDirections()
 
         //Valid Moves to Capture if there is a piece different then ours in the middle of our targetSquare
         val captureMoves = captureDirections.mapNotNull { direction ->

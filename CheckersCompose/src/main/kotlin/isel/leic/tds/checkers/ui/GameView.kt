@@ -19,7 +19,6 @@ val MARGIN_WIDTH = 12.dp
 val GRID_WIDTH = CELL_SIZE * BOARD_DIM + LINE_WIDTH * (BOARD_DIM-1)
 val BOARD_WITH  = GRID_WIDTH + (2 * MARGIN_WIDTH)
 
-private val darkBrown = Color(139, 69, 19)
 
 data class BoardTheme(
     val squareColor: Color,
@@ -119,12 +118,9 @@ fun GameTheme(square: Square, theme: Theme): BoardTheme {
     }
 }
 
-
-
 @Composable
 @Preview
 fun GamePreview() {
     val game = Game().new()
-
     GameView(game.board!!,true,null, Player.WHITE, Theme.LIGHT) { }
 }

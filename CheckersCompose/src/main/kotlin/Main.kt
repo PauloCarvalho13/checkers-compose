@@ -14,7 +14,7 @@ const val BOARD_DIM = 8
 
 @Composable
 @Preview
-private fun FrameWindowScope.BoardApp(vm: AppViewModel) {
+private fun BoardApp(vm: AppViewModel) {
     MaterialTheme {
         Column {
             GameView(
@@ -39,8 +39,8 @@ fun FrameWindowScope.BoardMenu(vm: AppViewModel, onExit: ()->Unit){
         Menu("Game"){
             Item("New board", enabled = vm.isSideTurn, onClick = vm::newBoard)
             Item("Score",  enabled = vm.hasClash, onClick = vm::showScore)
-            Item("Exit", onClick = onExit )
             Item("Refresh",  enabled = vm.hasClash && !vm.autoRefresh, onClick = vm::refresh)
+            Item("Exit", onClick = onExit )
         }
         Menu("Clash") {
             Item("Start", onClick = vm::start)
@@ -59,15 +59,20 @@ fun FrameWindowScope.BoardMenu(vm: AppViewModel, onExit: ()->Unit){
             )
         }
         Menu("Theme"){
-            CheckboxItem(
-                text = "Light",
-                checked = vm.selectedTheme == Theme.LIGHT,
-                onCheckedChange =  { vm.changeTheme(Theme.LIGHT) }
+            RadioButtonItem(
+                text = "Default",
+                selected = vm.selectedTheme == Theme.DEFAULT,
+                onClick = {vm.changeTheme(Theme.DEFAULT)}
             )
-            CheckboxItem(
+            RadioButtonItem(
+                text = "Light",
+                selected = vm.selectedTheme == Theme.LIGHT,
+                onClick =  { vm.changeTheme(Theme.LIGHT) }
+            )
+            RadioButtonItem(
                 text = "Colorful",
-                checked = vm.selectedTheme == Theme.COLORFUL,
-                onCheckedChange = { vm.changeTheme(Theme.COLORFUL) }
+                selected = vm.selectedTheme == Theme.COLORFUL,
+                onClick = { vm.changeTheme(Theme.COLORFUL) }
             )
         }
     }

@@ -13,7 +13,7 @@ sealed class Board(val moves: Moves) {
 class BoardRun(val turn: Player, squares: Moves = emptyMap()): Board(squares)
 class BoardWin( val winner: Player, squares: Moves): Board(squares)
 
-class InvalidMoveException(): IllegalArgumentException()
+class InvalidMoveException: IllegalArgumentException()
 
 private val piecesPerPlayer = mapOf(8 to 12, 6 to 6,  4 to 2)
 

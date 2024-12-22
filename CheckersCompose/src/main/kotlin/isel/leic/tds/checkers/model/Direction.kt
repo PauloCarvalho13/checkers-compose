@@ -15,6 +15,12 @@ enum class Direction(val row: Int, val column: Int) {
 
 }
 
+fun Player.possibleDirections(): List<Direction> =
+    when {
+        this == Player.WHITE -> listOf(Direction.DOWN_LEFT_CAP, Direction.DOWN_RIGHT_CAP)
+        else -> listOf(Direction.UP_LEFT_CAP,Direction.UP_RIGHT_CAP)
+    }
+
 fun directionOfMove(from: Square, to: Square, moves: Moves): Direction {
     val piece = moves[from] ?: return Direction.UNKNOWN
     val rowDiff = to.row.index - from.row.index

@@ -22,19 +22,17 @@ import isel.leic.tds.checkers.model.Name
 fun NameEdit(
     action: Action,
     onCancel: ()->Unit,
-    onAction: (Name/*, Int*/)->Unit
+    onAction: (Name)->Unit
 ) {
     var txt by remember{ mutableStateOf("") }
-    // TODO
-    var boardDim by remember { mutableStateOf(8) }
-    val boardSizes = listOf(4, 6, 8)
+
     AlertDialog(
         title = { Text("Name to ${action.text}", style = MaterialTheme.typography.h4) },
         onDismissRequest = { },
         confirmButton = {
             TextButton(
                 enabled = Name.isValid(txt),
-                onClick = { onAction(Name(txt)/*, boardDim*/) }
+                onClick = { onAction(Name(txt)) }
             ) { Text(action.text) }
         },
         dismissButton = {
@@ -54,29 +52,14 @@ fun NameEdit(
                     keyboardActions = KeyboardActions(
                         onDone = {
                             if (Name.isValid(txt)) {
-                                onAction(Name(txt)/*, boardDim*/)
+                                onAction(Name(txt))
                             }
                         }
                     ),
                     singleLine = true
                 )
-             if (action.name == "START"){
+                if (action.name == "START"){
                     Spacer(modifier = Modifier.height(16.dp))
-
-                    Text("Select Board Size:")
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                        boardSizes.forEach { size ->
-                            TextButton(
-                                onClick = { boardDim = size },
-                                enabled = boardDim != size
-                            ) {
-                                Text(
-                                    text = "$size x $size",
-                                    color = if (boardDim == size) MaterialTheme.colors.primary else MaterialTheme.colors.onSurface
-                                )
-                            }
-                        }
-                    }
                 }
             }
         }

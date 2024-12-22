@@ -2,7 +2,6 @@ package isel.leic.tds.checkers.model
 
 import BOARD_DIM
 import isel.leic.tds.checkers.model.Square.Companion.values
-import kotlin.math.absoluteValue
 
 class Square private constructor (val index: Int) {
     init {
@@ -76,9 +75,6 @@ fun Square.getMiddleSquare(to: Square, moves: Moves): Square? {
 
     return walk(this)
 }
-
-
-
 
 
 fun Square(row: Row, column: Column): Square

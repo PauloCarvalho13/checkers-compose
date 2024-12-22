@@ -7,7 +7,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import isel.leic.tds.checkers.model.*
 
@@ -23,18 +22,13 @@ fun StatusBarView(clash: Clash) {
         when (clash) {
             is ClashRun -> {
                 Text("Game: ${clash.id}")
-                Spacer(Modifier.width(22.dp))
                 clash.sidePlayer.let { sidePlayer ->
                     Text("You: ${sidePlayer.name}", fontSize = 18.sp)
-                    Spacer(Modifier.width(18.dp))
-
                     val message = when (clash.game.board) {
                         is BoardRun -> if (clash.game.board.turn == sidePlayer) "Your turn" else "Waiting.."
                         is BoardWin -> if (clash.game.board.winner == sidePlayer) "You WIN" else "You LOSE"
                         else -> ""
                     }
-
-                    Spacer(Modifier.size(18.dp))
                     Text(message, fontSize = 18.sp)
                 }
             }

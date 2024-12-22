@@ -2,7 +2,6 @@ package isel.leic.tds.checkers.model
 
 import BOARD_DIM
 
-
 abstract class Piece(val player: Player){
     override fun equals(other: Any?): Boolean =
         other is Piece && player == other.player

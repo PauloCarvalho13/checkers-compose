@@ -1,6 +1,7 @@
 package isel.leic.tds.checkers.model
 
 import BOARD_DIM
+import kotlin.math.abs
 
 abstract class Piece(val player: Player){
     override fun equals(other: Any?): Boolean =
@@ -27,4 +28,30 @@ abstract class Piece(val player: Player){
             else -> this // if it's already a Queen stays the same
         }
     }
+}
+
+fun walkPath(from: Square, to: Square, step: Int = 1): List<Square> {
+    val rowDiff = to.row.index - from.row.index
+    val colDiff = to.column.index - from.column.index
+
+    // Ensure the path is diagonal
+    if (abs(rowDiff) != abs(colDiff)) return emptyList()
+
+    val rowStep = rowDiff / abs(rowDiff) * step
+    val colStep = colDiff / abs(colDiff) * step
+
+    val path = mutableListOf<Square>()
+    var current = from
+
+    while (true) {
+        val nextRow = current.row.index + rowStep
+        val nextCol = current.column.index + colStep
+
+        if (nextRow == to.row.index && nextCol == to.column.index) break
+
+        current = Square(nextRow.toRow(), nextCol.toColumn())
+        path.add(current)
+    }
+
+    return path
 }

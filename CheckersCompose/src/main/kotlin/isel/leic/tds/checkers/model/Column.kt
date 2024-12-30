@@ -25,3 +25,5 @@ fun Char.toColumnOrNull(): Column? {
     val index = this.code - FIRST_CHAR_CODE
     return if (index in 0 until BOARD_DIM) Column(index) else null
 }
+
+fun Int.toColumn(): Column = Column.values[this]

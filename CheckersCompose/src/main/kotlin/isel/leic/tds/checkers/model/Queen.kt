@@ -13,18 +13,10 @@ class Queen(player: Player) : Piece(player) {
 
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
         val direction = directionOfMove(from, to, moves)
+        val path = walkPath(from, to)
 
-        tailrec fun findPathToSquare(currentSquare: Square?): Boolean =
-            when {
-                currentSquare == null -> false
-                currentSquare == to -> true
-                moves[currentSquare] != null -> false
-                else -> findPathToSquare(currentSquare.move(direction))
-            }
-        // Check if the to Square has a piece
-        if(moves[to] != null) return false
-
-        return findPathToSquare(from.move(direction))
+        // Ensure the path is along the calculated direction and all squares except `to` are empty
+        return path.all { square -> moves[square] == null } && direction != Direction.UNKNOWN
     }
 
     // gets all the possible captures of a piece

@@ -119,14 +119,28 @@ fun Moves.getAllCaptures(player: Player): Moves =
 fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val fromPiece = this[from] ?: return this
 
+    // Start by updating the move itself
     val newMoves = this - from + (to to piece)
+    println("Updated Moves function")
 
-    val capturedSquare = if(fromPiece.canCapture(from, to, this)){
-        from.getMiddleSquare(to,this)
-    } else null
+    // Check if the move results in a capture
+    val capturedSquares = if (fromPiece.canCapture(from, to, this)) {
 
-    return if (capturedSquare != null && this.containsKey(capturedSquare))
-        newMoves - capturedSquare // Remove the piece that was captured
-    else
-        newMoves
+        val path = walkPath(from, to)
+
+        // Filter the squares in the path that contain an opponent's piece
+        path.filter { this[it]?.player != fromPiece.player } // Capture only if piece belongs to opponent
+    } else {
+        emptyList()
+    }
+
+    // Remove the captured squares from the newMoves
+    val updatedMoves = capturedSquares.fold(newMoves) { moves, capturedSquare ->
+        moves - capturedSquare // Remove the captured square from the moves map
+    }
+
+    return updatedMoves
 }
+
+
+

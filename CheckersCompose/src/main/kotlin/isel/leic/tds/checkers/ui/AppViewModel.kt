@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import isel.leic.tds.checkers.model.*
 import isel.leic.tds.checkers.storage.MongoDriver
+import isel.leic.tds.checkers.storage.MongoStorage
 import isel.leic.tds.checkers.storage.TextFileStorage
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
@@ -23,8 +24,8 @@ enum class Theme {
 }
 
 class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
-    val storage = TextFileStorage<Name,Game>("games",GameSerializer)
-    //val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
+    //val storage = TextFileStorage<Name,Game>("games",GameSerializer)
+    val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
 
     var clash: Clash by mutableStateOf(Clash(storage))
     val hasClash:Boolean get() = clash is ClashRun

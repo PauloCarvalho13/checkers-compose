@@ -98,22 +98,24 @@ fun GameView(
             }
         }
     }
+
+    if(board != null && board.winner() != null) EndGameDialog(board.winner()!!)
 }
 
 @Composable
 fun GameTheme(square: Square, theme: Theme): BoardTheme {
     return when (theme) {
         Theme.DEFAULT -> BoardTheme(
-            squareColor = if (square.black) Color(0xFF4E342E) else Color(0xFFD7CCC8),
-            columnColor = Color(0xFF616161)
+            squareColor = if (square.black) SquareColors.DEFAULT_BLACK.color else SquareColors.DEFAULT_WHITE.color,
+            columnColor = ColumnColors.DEFAULT.color
         )
         Theme.LIGHT -> BoardTheme(
-            squareColor = if (square.black) Color(0xFFB3E5FC) else Color(0xFFFFFFFF),
-            columnColor = Color(0xFF00ACC1)
+            squareColor = if (square.black) SquareColors.LIGHT_BLACK.color else SquareColors.LIGHT_WHITE.color,
+            columnColor = ColumnColors.LIGHT.color
         )
         Theme.COLORFUL -> BoardTheme(
-            squareColor = if (square.black) Color(0xFFF48FB1) else Color(0xFFFFF59D),
-            columnColor = Color(0xFF00ACC1)
+            squareColor = if (square.black) SquareColors.COLORFUL_BLACK.color else SquareColors.COLORFUL_WHITE.color,
+            columnColor = ColumnColors.COLORFUL.color
         )
     }
 }

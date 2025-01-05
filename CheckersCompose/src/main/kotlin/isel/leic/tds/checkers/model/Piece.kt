@@ -4,13 +4,18 @@ import BOARD_DIM
 import kotlin.math.abs
 
 abstract class Piece(val player: Player){
-    override fun equals(other: Any?): Boolean =
-        other is Piece && player == other.player
-    override fun hashCode() = player.hashCode()
     abstract val type: String
-    open fun canMove(from: Square, to: Square, moves: Moves): Boolean = false
-    open fun canCapture(from: Square, to: Square, moves: Moves): Boolean = false
-    open fun getPossibleCaptures(from: Square, moves: Moves): Moves = moves
+    abstract val captureDirections: List<Direction>
+    abstract val moveDirections:List<Direction>
+
+    override fun equals(other: Any?): Boolean = other is Piece && player == other.player
+    override fun hashCode() = player.hashCode()
+
+    abstract fun canMove(from: Square, to: Square, moves: Moves): Boolean
+    abstract fun getPossibleMoves(from:Square, moves:Moves): List<Square>
+    abstract fun canCapture(from: Square, to: Square, moves: Moves): Boolean
+    abstract fun getPossibleCaptures(from: Square, moves: Moves): Moves
+
 
     fun checkPiece(to: Square): Piece{
         return when(this){
@@ -35,7 +40,7 @@ fun walkPath(from: Square, to: Square, step: Int = 1): List<Square> {
     val colDiff = to.column.index - from.column.index
 
     // Ensure the path is diagonal
-    if (abs(rowDiff) != abs(colDiff)) return emptyList()
+    if (rowDiff == 0 || colDiff == 0 || abs(rowDiff) != abs(colDiff)) return emptyList()
 
     val rowStep = rowDiff / abs(rowDiff) * step
     val colStep = colDiff / abs(colDiff) * step

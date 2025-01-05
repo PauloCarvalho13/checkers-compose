@@ -2,16 +2,28 @@ package isel.leic.tds.checkers.model
 
 class Pawn(player: Player): Piece(player) {
     override val type: String = "P"
+    override val captureDirections get() = possibleDirections(true)
+    override val moveDirections: List<Direction> get() = possibleDirections(false)
 
-    // should check the start square is in moves
-    override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
-        val direction = directionOfMove(from, to, moves)
-        // its already assured that the start position is valid, checked at Game.play()
-        return direction != Direction.UNKNOWN && from.move(direction) == to && moves[to] == null
+    override fun canMove(from: Square, to: Square, moves: Moves): Boolean =
+        getPossibleMoves(from, moves).contains(to)
+
+    override fun getPossibleMoves(from: Square, moves: Moves): List<Square> {
+
+        moves[from] ?: return emptyList()
+
+        val possibleMoves = mutableListOf<Square>()
+
+        moveDirections.forEach { direction ->
+            val targetSquare = from.move(direction)
+            if (targetSquare != null && moves[targetSquare] == null) possibleMoves.add(targetSquare)
+        }
+        return possibleMoves
     }
 
+
+
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
-        val captureDirections = player.possibleDirections()
 
         // Valid Moves to Capture if there is a piece different then ours in the middle of our targetSquare
         val captureMoves = captureDirections.mapNotNull { direction ->
@@ -41,6 +53,7 @@ class Pawn(player: Player): Piece(player) {
         // the squares need to be ordered or the presentation functions will fail
         return captureMoves.sortedBy { (square, _) -> square.index }.toMap()
     }
+
 
     override fun canCapture(from: Square, to: Square, moves: Moves): Boolean =
         getPossibleCaptures(from, moves).containsKey(to)

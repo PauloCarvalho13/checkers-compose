@@ -10,7 +10,7 @@ import isel.leic.tds.checkers.model.*
 import isel.leic.tds.checkers.storage.MongoDriver
 import isel.leic.tds.checkers.ui.*
 
-const val BOARD_DIM = 8
+const val BOARD_DIM = 6
 
 @Composable
 @Preview

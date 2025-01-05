@@ -6,6 +6,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -19,22 +20,36 @@ val MARGIN_WIDTH = 12.dp
 val GRID_WIDTH = CELL_SIZE * BOARD_DIM + LINE_WIDTH * (BOARD_DIM-1)
 val BOARD_WITH  = GRID_WIDTH + (2 * MARGIN_WIDTH)
 
-
-data class BoardTheme(
-    val squareColor: Color,
-    val columnColor: Color
-)
+data class BoardTheme(val squareColor: Color, val columnColor: Color)
 
 @Composable
 fun GameView(
     board: Board?,
     showTargets: Boolean,
-    selectedMove: Pair<Square, Piece>?,
-    sidePlayer: Player = Player.WHITE,
+    selectedMove: SelectedMove?,
     theme: Theme,
-    onClickSquare: (Square) -> Unit
+    onClickSquare: (Square) -> Unit,
+    sidePlayer: Player = Player.WHITE
 ) {
     val boardTheme = GameTheme(Square(Row(0), Column(0)), theme)
+    val moves = board?.moves ?: emptyMap()
+
+    val playerCaptures = remember(board) {
+        board?.let { b ->
+            b.moves.entries
+                .filter { it.value.player == sidePlayer }
+                .flatMap { (square, piece) ->
+                    piece.getPossibleCaptures(square, moves).keys // Get possible captures for each piece
+                }
+        } ?: emptyList()
+    }
+
+    val possibleMoves = remember(selectedMove){
+        selectedMove?.let {
+            it.piece.getPossibleMoves(it.square, moves)
+        }?: emptyList()
+    }
+
     Column(modifier = Modifier.size(BOARD_WITH + MARGIN_WIDTH).background(boardTheme.columnColor)) {
         Column(
             modifier = Modifier.size(BOARD_WITH),
@@ -69,23 +84,22 @@ fun GameView(
 
                     repeat(BOARD_DIM) { col ->
                         val square = Square(Row(row), Column(col))
-                        val moves = board?.moves
 
                         val squareColor = GameTheme(square, theme).squareColor
 
-                        val isSelected = selectedMove?.first == square
+                        val isSelected = selectedMove?.square == square
+
                         val isPossibleMove = selectedMove != null &&
                                 board is BoardRun &&
-                                selectedMove.second.getPossibleCaptures(selectedMove.first, moves ?: emptyMap()).isEmpty() &&
-                                selectedMove.second.canMove(selectedMove.first, square, moves ?: emptyMap()) &&
-                                (moves ?: emptyMap()).getAllCaptures(sidePlayer).isEmpty()
+                                playerCaptures.isEmpty() &&
+                                possibleMoves.contains(square)
 
                         val isPossibleCapture = selectedMove != null &&
                                 board is BoardRun &&
-                                selectedMove.second.canCapture(selectedMove.first, square, moves ?: emptyMap())
+                                selectedMove.piece.getPossibleCaptures(selectedMove.square, moves).containsKey(square)
 
                         SquareView(
-                            piece = moves?.get(square),
+                            piece = moves[square],
                             showTargets = showTargets,
                             isSelected = isSelected,
                             isPossibleMove = isPossibleMove,
@@ -124,5 +138,5 @@ fun GameTheme(square: Square, theme: Theme): BoardTheme {
 @Preview
 fun GamePreview() {
     val game = Game().new()
-    GameView(game.board!!,true,null, Player.WHITE, Theme.LIGHT) { }
+    GameView(game.board!!,true,null, Theme.LIGHT, { })
 }

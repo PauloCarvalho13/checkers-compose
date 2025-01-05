@@ -29,14 +29,14 @@ private fun Clash.remove() {
 }
 
 fun Clash.start(id : Name): Clash {
-    require(st.read(id) == null)
+    require(st.read(id) == null) { "There is a game with this $id name already" }
     val game = Game().new()
     st.create(id,game)
     return ClashRun(st, game, Player.WHITE, id)
 }
 
 fun Clash.join(id: Name): Clash{
-    val game = requireNotNull(st.read(id))
+    val game = requireNotNull(st.read(id)) { "No game found with $id name" }
     return ClashRun(st, game, game.firstPlayer, id)
 }
 

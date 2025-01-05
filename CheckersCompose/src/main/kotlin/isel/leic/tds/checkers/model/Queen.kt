@@ -2,24 +2,36 @@ package isel.leic.tds.checkers.model
 
 
 class Queen(player: Player) : Piece(player) {
-    private val directions = listOf(
-        Direction.UP_LEFT,
-        Direction.UP_RIGHT,
-        Direction.DOWN_LEFT,
-        Direction.DOWN_RIGHT
-    )
+    override val captureDirections get() = possibleDirections(true)
+    override val moveDirections get() = possibleDirections(false)
 
     override val type: String get() = "Q"
 
-    override fun canMove(from: Square, to: Square, moves: Moves): Boolean {
-        val direction = directionOfMove(from, to, moves)
-        val path = walkPath(from, to)
+    override fun canMove(from: Square, to: Square, moves: Moves): Boolean =
+        getPossibleMoves(from, moves).contains(to)
 
-        // Ensure the path is along the calculated direction and all squares except `to` are empty
-        return path.all { square -> moves[square] == null } && direction != Direction.UNKNOWN
+    override fun getPossibleMoves(from: Square, moves: Moves): List<Square> {
+        val possibleMoves = mutableListOf<Square>()
+
+        moveDirections.forEach { direction ->
+            var currentSquare = from
+
+            while (true) {
+                val nextSquare = currentSquare.move(direction) ?: break
+
+                if (moves[nextSquare] == null) {
+                    possibleMoves.add(nextSquare)
+                    currentSquare = nextSquare
+                } else {
+                    // Stop if the square is occupied by any piece (either ally or opponent)
+                    break
+                }
+            }
+        }
+        return possibleMoves
     }
 
-    // gets all the possible captures of a piece
+
     override fun getPossibleCaptures(from: Square, moves: Moves): Moves {
         val fromPiece = moves[from] ?: return emptyMap()
 
@@ -57,7 +69,7 @@ class Queen(player: Player) : Piece(player) {
         }
 
         // Search for every direction to get the possible captures
-        return directions.fold(emptyMap()) { acc, direction ->
+        return captureDirections.fold(emptyMap()) { acc, direction ->
             acc + findCaptures(from, direction)
         }
     }

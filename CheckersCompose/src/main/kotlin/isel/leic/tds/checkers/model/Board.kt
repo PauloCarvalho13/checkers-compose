@@ -46,11 +46,12 @@ fun Board.isValidMove(from: Square, to: Square): Boolean{
 }
 
 fun Board.play(from: Square, to: Square): Board {
-    check(this is BoardRun){ "Game Over" }
 
-   if(!isValidMove(from, to)){
+    check(isThereAvailableMoves()) { "Game Over no valid moves left, please forfeit" }
+
+    if(!isValidMove(from, to)){
        throw InvalidMoveException()
-   }
+    }
 
     val boardAfter = this.makePlay(from , to)
     val winner = boardAfter.winner()
@@ -66,7 +67,6 @@ fun Board.makePlay(from: Square, to: Square): BoardRun {
     val fromPiece = moves[from]
     requireNotNull(fromPiece) {"Invalid piece"}
 
-    // get all possible captures
     val captureMoves = moves.getAllCaptures(turn)
 
     // Checking if the piece is a Pawn or a Queen
@@ -86,7 +86,6 @@ fun Board.makePlay(from: Square, to: Square): BoardRun {
 
         // if there are still captures available print this information
         if (checkPiece.getPossibleCaptures(to, updatedMoves).isNotEmpty()) {
-            println("You can play again!")
             return BoardRun(turn, updatedMoves)
         }
     }
@@ -107,27 +106,21 @@ fun Board.winner(): Player? {
 }
 
 fun Moves.getAllCaptures(player: Player): Moves =
-    this
-        .filter { it.value.player == player }
+    this.filter { it.value.player == player }
         .flatMap { (square, piece) ->
             val pieceCaptures = piece.getPossibleCaptures(square, this)
             if(!pieceCaptures.containsKey(square)) pieceCaptures.entries.map { it.toPair() }
             else listOf(square to piece) + pieceCaptures.entries.map { it.toPair() }
-        }
-        .toMap()
+        }.toMap()
 
 fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     val fromPiece = this[from] ?: return this
 
-    // Start by updating the move itself
     val newMoves = this - from + (to to piece)
-    println("Updated Moves function")
 
     // Check if the move results in a capture
     val capturedSquares = if (fromPiece.canCapture(from, to, this)) {
-
         val path = walkPath(from, to)
-
         // Filter the squares in the path that contain an opponent's piece
         path.filter { this[it]?.player != fromPiece.player } // Capture only if piece belongs to opponent
     } else {
@@ -142,5 +135,10 @@ fun Moves.updateMoves(from: Square, to: Square, piece: Piece): Moves {
     return updatedMoves
 }
 
-
-
+fun Board.isThereAvailableMoves(): Boolean {
+    check(this is BoardRun) { "Game Over" }
+    return moves.filter { it.value.player == turn }.any {
+        it.value.getPossibleMoves(it.key, moves).isNotEmpty()
+                || it.value.getPossibleCaptures(it.key, moves).isNotEmpty()
+    }
+}

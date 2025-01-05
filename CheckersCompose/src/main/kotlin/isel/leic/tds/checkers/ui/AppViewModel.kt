@@ -23,9 +23,11 @@ enum class Theme {
     DEFAULT, LIGHT, COLORFUL
 }
 
+data class SelectedMove(val square: Square, val piece: Piece)
+
 class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
-    //val storage = TextFileStorage<Name,Game>("games",GameSerializer)
-    val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
+    val storage = TextFileStorage<Name,Game>("games",GameSerializer)
+    //val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
 
     var clash: Clash by mutableStateOf(Clash(storage))
     val hasClash:Boolean get() = clash is ClashRun
@@ -33,7 +35,7 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     val game: Game? get() = (clash as? ClashRun)?.game
     val board: Board? get() = game?.board
 
-    var selectedMove: Pair<Square, Piece>? by mutableStateOf(null)
+    var selectedMove: SelectedMove? by mutableStateOf(null)
 
     val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
     val isSideTurn get() = clash.isSideTurn
@@ -47,18 +49,18 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
 
         val boardRun = board as BoardRun
         val pieceOnSquare: Piece? = boardRun.moves[square]
-        val previousMove: Pair<Square, Piece>? = selectedMove
+        val previousMove = selectedMove
 
         when {
 
             previousMove != null && pieceOnSquare == null -> {
-                exec { play(previousMove.first, square) }
+                exec { play(previousMove.square, square) }
 
                 if (autoRefresh) waitingForOther()
             }
 
             pieceOnSquare != null && pieceOnSquare.player == sidePlayer -> {
-                selectedMove = Pair(square, pieceOnSquare)
+                selectedMove = SelectedMove(square, pieceOnSquare)
             }
 
         }

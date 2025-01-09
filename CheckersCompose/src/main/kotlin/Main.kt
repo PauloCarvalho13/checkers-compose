@@ -21,6 +21,8 @@ private fun BoardApp(vm: AppViewModel) {
                 board = vm.board ,
                 showTargets = vm.showTargets,
                 selectedMove = vm.selectedMove,
+                playerCaptures = vm.playerCaptures,
+                possibleMoves = vm.possibleMoves,
                 sidePlayer = vm.sidePlayer ?: Player.WHITE ,
                 onClickSquare = { square: Square -> vm.selectSquare(square) },
                 theme = vm.selectedTheme

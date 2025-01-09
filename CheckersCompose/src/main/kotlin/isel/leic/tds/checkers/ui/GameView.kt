@@ -6,7 +6,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -27,29 +26,14 @@ fun GameView(
     board: Board?,
     showTargets: Boolean,
     selectedMove: SelectedMove?,
+    playerCaptures: List<Square>,
+    possibleMoves: List<Square>,
     theme: Theme,
     sidePlayer: Player,
     onClickSquare: (Square) -> Unit
 ) {
     val boardTheme = GameTheme(Square(Row(0), Column(0)), theme)
     val moves = board?.moves ?: emptyMap()
-
-    val playerCaptures = remember(moves) {
-        board?.let { b ->
-            b.moves.entries
-                .filter { it.value.player == sidePlayer }
-                .flatMap { (square, piece) ->
-                    piece.getPossibleCaptures(square, moves).keys // Get possible captures for each player piece
-                }
-        } ?: emptyList()
-    }
-
-    val possibleMoves = remember(selectedMove){
-        selectedMove?.let {
-            it.piece.getPossibleMoves(it.square, moves)
-        }?: emptyList()
-    }
-
     Column(modifier = Modifier.size(BOARD_WITH + MARGIN_WIDTH).background(boardTheme.columnColor)) {
         Column(
             modifier = Modifier.size(BOARD_WITH),
@@ -93,7 +77,7 @@ fun GameView(
                                 board is BoardRun &&
                                 playerCaptures.isEmpty() &&
                                 possibleMoves.contains(square)
-
+                        // TODO try to remove last verification
                         val isPossibleCapture = selectedMove != null &&
                                 board is BoardRun &&
                                 selectedMove.piece.getPossibleCaptures(selectedMove.square, moves).containsKey(square)
@@ -138,5 +122,5 @@ fun GameTheme(square: Square, theme: Theme): BoardTheme {
 @Preview
 fun GamePreview() {
     val game = Game().new()
-    GameView(game.board!!,true,null, Theme.LIGHT,Player.WHITE) { }
+    GameView(game.board!!,true,null, emptyList(), emptyList(),Theme.LIGHT,Player.WHITE) { }
 }

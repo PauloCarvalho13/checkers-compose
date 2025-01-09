@@ -40,6 +40,23 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
     val isSideTurn get() = clash.isSideTurn
 
+
+    private val moves get() = board?.moves ?: emptyMap()
+
+    val playerCaptures get() =
+        board?.let { b ->
+            b.moves.entries
+                .filter { it.value.player == sidePlayer }
+                .flatMap { (square, piece) ->
+                    piece.getPossibleCaptures(square, moves).keys // Get possible captures for each player piece
+                }
+        } ?: emptyList()
+
+    val possibleMoves get() = selectedMove?.let {
+            it.piece.getPossibleMoves(it.square, moves)
+    }?: emptyList()
+
+
     val score get() = game?.score
 
     fun selectSquare(square: Square) {

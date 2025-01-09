@@ -28,18 +28,18 @@ fun GameView(
     showTargets: Boolean,
     selectedMove: SelectedMove?,
     theme: Theme,
-    onClickSquare: (Square) -> Unit,
-    sidePlayer: Player = Player.WHITE
+    sidePlayer: Player,
+    onClickSquare: (Square) -> Unit
 ) {
     val boardTheme = GameTheme(Square(Row(0), Column(0)), theme)
     val moves = board?.moves ?: emptyMap()
 
-    val playerCaptures = remember(board) {
+    val playerCaptures = remember(moves) {
         board?.let { b ->
             b.moves.entries
                 .filter { it.value.player == sidePlayer }
                 .flatMap { (square, piece) ->
-                    piece.getPossibleCaptures(square, moves).keys // Get possible captures for each piece
+                    piece.getPossibleCaptures(square, moves).keys // Get possible captures for each player piece
                 }
         } ?: emptyList()
     }
@@ -138,5 +138,5 @@ fun GameTheme(square: Square, theme: Theme): BoardTheme {
 @Preview
 fun GamePreview() {
     val game = Game().new()
-    GameView(game.board!!,true,null, Theme.LIGHT, { })
+    GameView(game.board!!,true,null, Theme.LIGHT,Player.WHITE) { }
 }

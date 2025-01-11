@@ -2,10 +2,10 @@ package isel.leic.tds.checkers.model
 
 
 class Queen(player: Player) : Piece(player) {
-    override val captureDirections get() = possibleDirections(true)
-    override val moveDirections get() = possibleDirections(false)
-
     override val type: String get() = "Q"
+
+    private val captureDirections get() = possibleDirections(true)
+    private val moveDirections get() = possibleDirections(false)
 
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean =
         getPossibleMoves(from, moves).contains(to)

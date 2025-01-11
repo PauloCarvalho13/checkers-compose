@@ -2,8 +2,9 @@ package isel.leic.tds.checkers.model
 
 class Pawn(player: Player): Piece(player) {
     override val type: String = "P"
-    override val captureDirections get() = possibleDirections(true)
-    override val moveDirections: List<Direction> get() = possibleDirections(false)
+
+    private val captureDirections get() = possibleDirections(true)
+    private val moveDirections: List<Direction> get() = possibleDirections(false)
 
     override fun canMove(from: Square, to: Square, moves: Moves): Boolean =
         getPossibleMoves(from, moves).contains(to)

@@ -5,8 +5,6 @@ import kotlin.math.abs
 
 abstract class Piece(val player: Player){
     abstract val type: String
-    abstract val captureDirections: List<Direction>
-    abstract val moveDirections:List<Direction>
 
     override fun equals(other: Any?): Boolean = other is Piece && player == other.player
     override fun hashCode() = player.hashCode()
@@ -16,6 +14,16 @@ abstract class Piece(val player: Player){
     abstract fun canCapture(from: Square, to: Square, moves: Moves): Boolean
     abstract fun getPossibleCaptures(from: Square, moves: Moves): Moves
 
+    protected fun possibleDirections(capturing: Boolean): List<Direction> =
+        if (this is Queen) listOf(Direction.UP_RIGHT, Direction.UP_LEFT, Direction.DOWN_RIGHT, Direction.DOWN_LEFT)
+        else when (this.player) {
+            Player.WHITE ->
+                if (capturing) listOf(Direction.UP_LEFT_CAP, Direction.UP_RIGHT_CAP)
+                else listOf(Direction.UP_LEFT, Direction.UP_RIGHT)
+            Player.BLACK ->
+                if (capturing) listOf(Direction.DOWN_LEFT_CAP, Direction.DOWN_RIGHT_CAP)
+                else listOf(Direction.DOWN_LEFT, Direction.DOWN_RIGHT)
+        }
 
     fun checkPiece(to: Square): Piece{
         return when(this){

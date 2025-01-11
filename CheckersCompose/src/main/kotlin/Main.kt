@@ -23,6 +23,7 @@ private fun BoardApp(vm: AppViewModel) {
                 selectedMove = vm.selectedMove,
                 playerCaptures = vm.playerCaptures,
                 possibleMoves = vm.possibleMoves,
+                selectedMoveCaptures = vm.selectedMoveCaptures,
                 sidePlayer = vm.sidePlayer ?: Player.WHITE ,
                 onClickSquare = { square: Square -> vm.selectSquare(square) },
                 theme = vm.selectedTheme

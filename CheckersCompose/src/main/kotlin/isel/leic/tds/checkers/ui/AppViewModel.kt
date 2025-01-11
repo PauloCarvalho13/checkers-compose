@@ -52,6 +52,11 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
                 }
         } ?: emptyList()
 
+    val selectedMoveCaptures get() =
+        selectedMove?.let {
+            it.piece.getPossibleCaptures(it.square, moves).keys.toList()
+        } ?: emptyList()
+
     val possibleMoves get() = selectedMove?.let {
             it.piece.getPossibleMoves(it.square, moves)
     }?: emptyList()

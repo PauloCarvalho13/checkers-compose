@@ -28,6 +28,7 @@ fun GameView(
     selectedMove: SelectedMove?,
     playerCaptures: List<Square>,
     possibleMoves: List<Square>,
+    selectedMoveCaptures: List<Square>,
     theme: Theme,
     sidePlayer: Player,
     onClickSquare: (Square) -> Unit
@@ -77,10 +78,10 @@ fun GameView(
                                 board is BoardRun &&
                                 playerCaptures.isEmpty() &&
                                 possibleMoves.contains(square)
-                        // TODO try to remove last verification
+
                         val isPossibleCapture = selectedMove != null &&
                                 board is BoardRun &&
-                                selectedMove.piece.getPossibleCaptures(selectedMove.square, moves).containsKey(square)
+                                selectedMoveCaptures.contains(square)
 
                         SquareView(
                             piece = moves[square],
@@ -122,5 +123,5 @@ fun GameTheme(square: Square, theme: Theme): BoardTheme {
 @Preview
 fun GamePreview() {
     val game = Game().new()
-    GameView(game.board!!,true,null, emptyList(), emptyList(),Theme.LIGHT,Player.WHITE) { }
+    GameView(game.board!!,true,null, emptyList(), emptyList(), emptyList(), Theme.LIGHT,Player.WHITE) { }
 }

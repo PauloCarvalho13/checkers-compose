@@ -30,12 +30,15 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     val storage = MongoStorage<Name, Game>("games",driver, GameSerializer)
 
     var clash: Clash by mutableStateOf(Clash(storage))
+        private set
+
     val hasClash:Boolean get() = clash is ClashRun
 
     val game: Game? get() = (clash as? ClashRun)?.game
     val board: Board? get() = game?.board
 
     var selectedMove: SelectedMove? by mutableStateOf(null)
+        private set
 
     val sidePlayer get() = (clash as? ClashRun)?.sidePlayer
     val isSideTurn get() = clash.isSideTurn
@@ -60,7 +63,6 @@ class AppViewModel(private val scope: CoroutineScope, driver: MongoDriver) {
     val possibleMoves get() = selectedMove?.let {
             it.piece.getPossibleMoves(it.square, moves)
     }?: emptyList()
-
 
     val score get() = game?.score
 

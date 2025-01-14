@@ -1,7 +1,7 @@
 package isel.leic.tds.checkers.storage
 
 class MemoryStorage<Key, Data: Any>: Storage<Key, Data> {
-    val map: MutableMap<Key,Data> = mutableMapOf()
+    private val map: MutableMap<Key,Data> = mutableMapOf()
 
     override fun create(key: Key, data: Data) {
         if (key in map) error("entry $key already exists")

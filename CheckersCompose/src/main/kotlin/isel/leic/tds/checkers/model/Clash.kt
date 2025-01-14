@@ -64,9 +64,9 @@ fun Clash.newBoard() = runOper {
     game.new().also { st.update(id,it) }
 }
 
-fun Clash.play(initpos: Square, finalpos: Square) = runOper {
+fun Clash.play(initPos: Square, finalPos: Square) = runOper {
     check(sidePlayer==(game.board as BoardRun).turn) { "Not your turn" }
-    game.play(initpos, finalpos).also {
+    game.play(initPos, finalPos).also {
         try { st.update(id,it) }
         catch (e:IllegalStateException){ throw GameDeletedException(id) }
     }

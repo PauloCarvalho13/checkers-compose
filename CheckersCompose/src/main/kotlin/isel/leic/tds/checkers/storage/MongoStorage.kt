@@ -9,7 +9,7 @@ class MongoStorage<Key, Data: Any>(
     data class Doc(val _id: String, val data: String)
     private fun Doc(key: Key, data: Data) =
         Doc(key.toString(), serializer.serialize(data))
-    val docs = driver.getCollection<Doc>(collectionName)
+    private val docs = driver.getCollection<Doc>(collectionName)
     // CRUD operations
     override fun create(key: Key, data: Data) {
         try{ docs.insertDocument(Doc(key, data)) }

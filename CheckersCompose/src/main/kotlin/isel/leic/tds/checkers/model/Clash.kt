@@ -25,7 +25,8 @@ class ClashRun(
 
 private fun Clash.remove() {
     if (this is ClashRun)
-        st.delete(this.id)
+        try { st.delete(this.id) }
+        catch (e:IllegalStateException) {throw GameDeletedException(id) }
 }
 
 fun Clash.start(id : Name): Clash {
@@ -66,7 +67,8 @@ fun Clash.newBoard() = runOper {
 fun Clash.play(initpos: Square, finalpos: Square) = runOper {
     check(sidePlayer==(game.board as BoardRun).turn) { "Not your turn" }
     game.play(initpos, finalpos).also {
-        st.update(id,it)
+        try { st.update(id,it) }
+        catch (e:IllegalStateException){ throw GameDeletedException(id) }
     }
 }
 
